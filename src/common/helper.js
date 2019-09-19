@@ -1,0 +1,106 @@
+/*
+ * @Author: eamiear
+ * @Date: 2019-02-19 10:38:33
+ * @Last Modified by: eamiear
+ * @Last Modified time: 2019-08-28 09:59:05
+ */
+
+const _toString = Object.prototype.toString
+
+export const Helper = {
+  isObject (obj) {
+    return obj !== null && typeof obj === 'object'
+  },
+  isArray (arr) {
+    return _toString.call(arr) === '[object Array]'
+  },
+  sort (val) {
+    const keys = Object.keys(val).sort()
+    const sortParam = {}
+    keys.forEach(key => {
+      sortParam[key] = val[key]
+    })
+    return sortParam
+  },
+  deepSort (params) {
+    for (const k in params) {
+      if (this.isArray(params[k])) { // 数组
+        for (let i = 0; i < params[k].length; i++) {
+          if (this.isObject(params[k][i])) {
+            params[k][i] = this.deepSort(params[k][i])
+          }
+        }
+      } else if (this.isObject(params[k])) { // JSON
+        params[k] = this.deepSort(params[k])
+      }
+    }
+    return this.sort(params)
+  },
+  deepClone (source) {
+    if (!source && typeof source !== 'object') {
+      throw new Error('error arguments', 'shallowClone')
+    }
+    const targetObj = source.constructor === Array ? [] : {}
+    for (const keys in source) {
+      if (source.hasOwnProperty(keys)) {
+        if (source[keys] && typeof source[keys] === 'object') {
+          targetObj[keys] = source[keys].constructor === Array ? [] : {}
+          targetObj[keys] = this.deepClone(source[keys])
+        } else {
+          targetObj[keys] = source[keys]
+        }
+      }
+    }
+    return targetObj
+  },
+  param2Obj (url) {
+    const search = url.split('?')[1]
+    if (!search) {
+      return {}
+    }
+    return JSON.parse('{"' + decodeURIComponent(search).replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g, '":"') + '"}')
+  },
+  getRouteNameByUrl (url) {
+    const val = /.*\/(.*)\.html/.exec(url)
+    return val && val.length >= 1 ? val[1] : ''
+  },
+  getRequest (name) {
+    const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`, 'i')
+    const path = window.location.href
+    const r = path.slice(path.indexOf('?') + 1).match(reg)
+    return (r && r.length) && r[2]
+  },
+  parseTime (time, fmt) {
+    if (arguments.length === 0) {
+      return null
+    }
+    const format = fmt || '{y}-{m}-{d} {h}:{i}:{s}'
+    let date
+    if (typeof time === 'object') {
+      date = time
+    } else {
+      if (('' + time).length === 10) time = parseInt(time) * 1000
+      date = new Date(time)
+    }
+    const formatObj = {
+      y: date.getFullYear(),
+      m: date.getMonth() + 1,
+      d: date.getDate(),
+      h: date.getHours(),
+      i: date.getMinutes(),
+      s: date.getSeconds(),
+      a: date.getDay()
+    }
+    const timeStr = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
+      let value = formatObj[key]
+      if (key === 'a') return ['一', '二', '三', '四', '五', '六', '日'][value - 1]
+      if (result.length > 0 && value < 10) {
+        value = '0' + value
+      }
+      return value || 0
+    })
+    return timeStr
+  }
+}
+
+export default Helper
