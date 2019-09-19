@@ -49,9 +49,13 @@ const menu = {
     },
     generateNavibarMenu ({ commit }) {
       return new Promise(resolve => {
+        commit('SET_MENU_NAV_LIST', systemtMenus)
+        const path = location.href.slice(location.href.indexOf('#') + 1, location.href.lastIndexOf('?'))
+        const defaultMenu = systemtMenus.find(item => item.path === path) || systemtMenus[0]
+        commit('UPDATE_MENU_NAV_ACTIVE_NAME', defaultMenu.path)
         store.dispatch('getUserInfo').then(userInfo => {
-          userInfo.type = 1
-          commit('SET_MENU_NAV_LIST', userInfo.type === 1 ? merchantMenus : operatorMenus)
+          // userInfo.type = 1
+          // commit('SET_MENU_NAV_LIST', userInfo.type === 1 ? merchantMenus : operatorMenus)
           resolve(userInfo)
         }).catch(() => {
           commit('SET_MENU_NAV_LIST', [])

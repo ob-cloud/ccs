@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:10:12
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-08-26 18:26:28
+ * @Last Modified time: 2019-09-19 21:09:52
  */
 
 import Vue from 'vue'
@@ -25,7 +25,7 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   if (Storage.get('token') && Storage.get('uid')) {
     store.dispatch('generateNavibarMenu')
-    store.dispatch('generatesystemMenu')
+    // store.dispatch('generatesystemMenu')
     to.path === '/login' ? next({ path: '/' }) : next()
   } else {
     to.path.includes('/login') ? next() : next({ path: '/login' })
