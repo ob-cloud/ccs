@@ -17,17 +17,17 @@ export const systemtMenus = [
     name: '社区养老院',
     path: '/house/list.html'
   }, {
-    id: 21,
-    name: '电子围栏',
-    path: '/system/fence.html'
+    id: 31,
+    name: '老人管理',
+    path: '/elder/index.html'
   }, {
     id: 3,
     name: '护工管理',
     path: '/nurse/index.html'
   }, {
-    id: 31,
-    name: '老人管理',
-    path: '/elder/index.html'
+    id: 21,
+    name: '电子围栏',
+    path: '/system/fence.html'
   }, {
     id: 4,
     name: '设备管理',
