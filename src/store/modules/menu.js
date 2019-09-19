@@ -58,7 +58,7 @@ const menu = {
           // commit('SET_MENU_NAV_LIST', userInfo.type === 1 ? merchantMenus : operatorMenus)
           resolve(userInfo)
         }).catch(() => {
-          commit('SET_MENU_NAV_LIST', [])
+          // commit('SET_MENU_NAV_LIST', [])
         })
       })
     },

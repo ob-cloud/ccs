@@ -9,6 +9,9 @@ import request from '@/common/fetch'
 const HouseAPI = {
   getHouseElderList () {
     return request.get('beadhouse/elder/list', {})
+  },
+  getHouseList () {
+    return request.get('beadhouse/list', {})
   }
 }
 export default HouseAPI
