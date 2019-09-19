@@ -8,7 +8,7 @@ import {
 
 // import Storage from '@/common/cache'
 // import SysMenuAPI from '@/api/menu'
-import { operatorMenus, merchantMenus, systemtMenus } from '@/router/menu'
+import { systemtMenus } from '@/router/menu'
 import store from '@/store'
 
 const menu = {

@@ -2,19 +2,18 @@
   <section class="app-container">
     <section class="app-body clearfix">
       <div class="box-container" style="overflow: auto" :style="{height: `${boxContainerHeight}px`}">
-        <div class="box" v-for="(item, index) in source" :key="index">
-          <p class="box-header">{{item.title}}</p>
+        <div class="box">
           <div class="box-content">
-            <el-card class="box-card" v-for="(itm, idx) in item.list" :key="idx">
-              <div slot="header" class="clearfix title" :style="{background: itm.activeColor}">
-                <span>{{itm.title}}</span>
+            <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx">
+              <div slot="header" class="clearfix title" :style="{background: parseStatusBackground(item.status, item.deviceStatus)}">
+                <span>{{item.status | statusFilter(item.deviceStatus)}}</span>
               </div>
               <div class="text item">
-                {{itm.text}}
+                {{item.roomNo}} {{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{itm.heart}}</el-button>
-                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{itm.collec}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate}}</el-button>
+                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure}}</el-button>
               </div>
             </el-card>
           </div>
@@ -25,11 +24,11 @@
 </template>
 
 <script>
-import data from '@/common/data'
+import HouseAPI from '@/api/house'
 export default {
   data () {
     return {
-      source: data,
+      elderList: [],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -37,12 +36,51 @@ export default {
       boxContainerHeight: 700
     }
   },
+  filters: {
+    statusFilter (val, preset) {
+      const statusMap = {
+        0: '离床未归',
+        1: '床上无人',
+        2: '床上有人'
+      }
+      const deviceStatus = {
+        0: '设备离线',
+        1: '设备在线',
+        2: '设备未绑定'
+      }
+      return preset === 1 ? statusMap[val] : deviceStatus[preset]
+    }
+  },
   mounted () {
-    this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
+    this.fixLayout()
+    this.getElderList()
   },
   methods: {
+    fixLayout () {
+      this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
+    },
+    getElderList () {
+      HouseAPI.getHouseElderList().then(res => {
+        if (res.code === 0) {
+          this.elderList = res.data.records
+        }
+      })
+    },
     handleNodeClick (e) {
       console.log(e)
+    },
+    parseStatusBackground (val, preset) {
+      const statusMap = {
+        0: '#eca8a8',
+        1: '#a2a2d4',
+        2: '#82e282'
+      }
+      const deviceStatus = {
+        0: '#b9b992',
+        1: '#82e282',
+        2: '#d0d0d0'
+      }
+      return preset === 1 ? statusMap[val] : deviceStatus[preset]
     }
   },
 }
