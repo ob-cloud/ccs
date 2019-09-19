@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:06:02
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-19 10:44:58
+ * @Last Modified time: 2019-09-19 18:17:07
  */
 
 import common from './common'
@@ -16,17 +16,12 @@ const menuRoutes = {
   desc: '首页',
   component: () => import('views/layout/Layout.vue'),
   redirect: { path: '/house/index.html' },
-  children: [{
-    name: '/house/index.html',
-    path: '/house/index.html',
-    desc: '首页',
-    component: () => import('views/house/index.vue'),
-  },
-  ...system,
-  ...house,
-  ...elder,
-  ...nurse,
-  ...common
+  children: [
+    ...system,
+    ...house,
+    ...elder,
+    ...nurse,
+    ...common
   ]
 }
 
