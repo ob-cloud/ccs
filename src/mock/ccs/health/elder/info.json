@@ -1,0 +1,11 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    id: '@id',
+    elder: '@cname',
+    'type|0-2': 0,
+    grade: '1-A',
+    'status|0-2': 0
+  }
+}

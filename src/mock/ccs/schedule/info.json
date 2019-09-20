@@ -1,0 +1,15 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    id: '@id',
+    deviceName: '@name',
+    imie: '@id',
+    nurseId: '@id',
+    'alarmType|0-4': 0,
+    alarmTime: '@datetime',
+    locationTime: '@datetime',
+    model: '@guid',
+    'status|0-2': 0
+  }
+}

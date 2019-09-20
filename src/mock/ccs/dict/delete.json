@@ -1,0 +1,16 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-2": [{
+      id: '@id',
+      name: '@name',
+      'type|0-100': 0
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

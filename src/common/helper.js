@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:33
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-08-28 09:59:05
+ * @Last Modified time: 2019-09-20 10:30:48
  */
 
 const _toString = Object.prototype.toString
@@ -100,6 +100,26 @@ export const Helper = {
       return value || 0
     })
     return timeStr
+  },
+  nextTick (fn) {
+    fn && this.$nextTick(fn)
+  },
+  calculateTableHeight () {
+    const winH = document.body.clientHeight
+    const navH = 50
+    const searchBarH = document.querySelector('.el-table-plus__header').clientHeight
+    const paginationH = 60
+    return winH - navH - searchBarH - paginationH - 50
+  },
+  windowOnResize (context, fn) {
+    setTimeout(() => {
+      this.nextTick.call(context, fn)
+      window.onresize = () => {
+        return (() => {
+          this.nextTick.call(context, fn)
+        })()
+      }
+    }, 0)
   }
 }
 

@@ -1,0 +1,17 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      nurseId: '@id',
+      name: '@cparagraph(1, 1)',
+      "code|0-100": 0
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

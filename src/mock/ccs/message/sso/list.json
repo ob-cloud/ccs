@@ -1,0 +1,24 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      deviceName: '@name',
+      nurse: '@cname',
+      elder: '@cname',
+      imie: '@id',
+      nurseId: '@id',
+      'alarmType|0-4': 0,
+      alarmTime: '@datetime',
+      locationTime: '@datetime',
+      model: '@guid',
+      'status|0-2': 0
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

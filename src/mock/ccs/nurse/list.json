@@ -1,0 +1,24 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      name: '@cname',
+      'gender|0-1': 0,
+      hiredate: '@datetime',
+      leavedate: '@datetime',
+      'status|0-1': 0,
+      rank: '@name',
+      task: '@cparagraph(1, 5)',
+      elder: '@cname',
+      houseId: '@id',
+      houseName: '@name'
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

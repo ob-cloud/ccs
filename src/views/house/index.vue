@@ -125,6 +125,7 @@ export default {
 }
 .box-content .box-card{
   width: 140px;
+  height: 132px;
   display: inline-block;
   margin-left: 10px;
   margin-bottom: 10px;

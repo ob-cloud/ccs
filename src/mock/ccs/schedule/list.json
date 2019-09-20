@@ -1,0 +1,23 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      nurseId: '@id',
+      nurse: '@cname',
+      elderId: '@id',
+      elder: '@cname',
+      taskId: '@id',
+      taskName: '@cparagraph(1, 1)',
+      taskContent: '@cparagraph(1, 3)',
+      createTime: '@datetime',
+      execTime: '@datetime'
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

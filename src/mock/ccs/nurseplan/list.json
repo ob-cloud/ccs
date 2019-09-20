@@ -1,0 +1,17 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      task: '@cparagraph(1, 1)',
+      elder: '@cname',
+      execTime: '@time'
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

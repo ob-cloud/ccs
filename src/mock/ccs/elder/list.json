@@ -1,0 +1,26 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-2": [{
+      id: '@id',
+      name: '@cname',
+      'status|0-1': 0,
+      'type|0-1': 0,
+      'checkInTime': 1508243577000,
+      'checkOutTime': 1508243577000,
+      address: '@city(true)',
+      'phoneNumber|18825166681-19825166681': 18825166681,
+      'feeStatus|0-1': 0,
+      contacts: '@cname',
+      'contactsPhone|18825166681-19825166681': 18825166681,
+      'bedNo|100-1000': 102,
+      'roomNo|100-1000': 102
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}

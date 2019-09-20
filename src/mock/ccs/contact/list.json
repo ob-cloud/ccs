@@ -1,0 +1,22 @@
+{
+  "code": 0,
+  "msg": "获取成功",
+  "data": {
+    "records|1-3": [{
+      id: '@id',
+      elderId: '@id',
+      name: '@cname',
+      nation: '汉',
+      'gender|0-1': 0,
+      idcard: '@id',
+      relation: '父子',
+      'phone|18825166681-19825166681': 18825166681,
+      address: '@city(true)'
+    }],
+    'total': function({
+      _req
+    }) {
+      return this.records.length
+    }
+  }
+}
