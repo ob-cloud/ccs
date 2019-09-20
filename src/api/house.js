@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-19 22:07:27
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 10:24:27
+ * @Last Modified time: 2019-09-20 15:14:09
  */
 import request from '@/common/fetch'
 
@@ -17,6 +17,18 @@ const HouseAPI = {
     return request.post({
       url: '/beadhouse/create',
       params: house
+    })
+  },
+  updateHouse (house) {
+    return request.post({
+      url: '/beadhouse/update',
+      params: house
+    })
+  },
+  deleteHouse (id) {
+    return request.post({
+      url: '/beadhouse/delete',
+      params: {id}
     })
   }
 }

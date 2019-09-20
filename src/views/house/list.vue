@@ -214,6 +214,7 @@ export default {
     handleCreate () {
       this.createDialogVisible = true
       this.dialogAction = '添加养老院'
+      this.houseModel = {}
     },
     createHouse () {
       this.$refs.houseForm.validate(valid => {
@@ -244,7 +245,7 @@ export default {
     handleEdit (row) {
       this.dialogAction = '编辑养老院'
       this.createDialogVisible = true
-      this.houseModel = row
+      this.houseModel = {...row}
     },
     handleDelete (row) {
       this.$confirm('确认删除养老院？', '确认提示', {
@@ -253,13 +254,31 @@ export default {
         type: 'warning',
         closeOnClickModal: false
       }).then(() => {
-        this.doRemove(row.scene_number)
+        this.doDelete(row.id)
       }).catch(() => {
         console.log('取消删除')
       })
     },
-    doDelete (row) {
-
+    doDelete (id) {
+      HouseAPI.deleteHouse(id).then(res => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: res.msg || '养老院删除成功'
+          })
+          this.getHouseList()
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.msg || '养老院删除失败'
+          })
+        }
+      }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: '服务异常' + err
+        })
+      })
     }
   }
 }
