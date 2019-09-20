@@ -26,28 +26,33 @@
       </slot>
     </base-table>
     <el-dialog top="10%" width="760px" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
-      <el-form ref="houseForm" :model="houseModel" label-width="100px">
-        <el-form-item label="名称">
+      <el-form ref="houseForm" :rules="houseModelRules" :model="houseModel" label-width="100px">
+        <el-form-item label="名称" prop="name">
           <el-input class="caption-item w8" placeholder="养老院名称" v-model="houseModel.name"></el-input>
         </el-form-item>
         <el-form-item label="性质">
-          <el-radio-group v-model="houseModel.type">
+          <el-radio-group v-model="houseModel.type" prop="type">
             <el-radio :label="0">公办</el-radio>
             <el-radio :label="1">民营</el-radio>
             <el-radio :label="2">公办民营</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="位置">
+        <el-form-item label="位置" class="address" prop="address">
            <el-cascader
             :options="addressOptions"
             v-model="houseModel.address"
             @change="onAddressChange">
           </el-cascader>
+          <el-input class="caption-item detail" placeholder="详细地址" v-model="houseModel.addressDetail"></el-input>
         </el-form-item>
-        <el-form-item label="联系人">
+        <el-form-item label="经纬度" class="coors" prop="lng">
+          <el-input class="caption-item w8" placeholder="经度" v-model="houseModel.lng"></el-input>
+          <el-input class="caption-item w8" placeholder="纬度" v-model="houseModel.lat"></el-input>
+        </el-form-item>
+        <el-form-item label="联系人"  prop="contact">
           <el-input class="caption-item w8" placeholder="联系人" v-model="houseModel.contact"></el-input>
         </el-form-item>
-        <el-form-item label="联系电话">
+        <el-form-item label="联系电话"  prop="phone">
           <el-input class="caption-item w8" placeholder="联系电话" v-model="houseModel.phone"></el-input>
         </el-form-item>
       </el-form>
@@ -63,6 +68,7 @@
 <script>
 import BaseTable from '@/assets/package/table-base'
 import HouseAPI from '@/api/house'
+import SystemAPI from '@/api/system'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
 export default {
@@ -81,7 +87,20 @@ export default {
       },
       houseModel: {
         name: '',
-        address: ''
+        address: '',
+        addressDetail: '',
+        lng: '',
+        lat: '',
+        contact: '',
+        phone: ''
+      },
+      houseModelRules: {
+        name: [{ required: true, trigger: 'blur', message: '名称不能为空'}],
+        type: [{ required: true, trigger: 'blur', message: '机构性质不能为空'}],
+        address: [{ required: true, trigger: 'blur', message: '地址不能为空'}],
+        lng: [{ required: true, trigger: 'blur', message: '经纬度不能为空'}],
+        contact: [{ required: true, trigger: 'blur', message: '联系人不能为空'}],
+        phone: [{ required: true, trigger: 'blur', message: '联系电话不能为空'}]
       },
       addressOptions: [],
       dialogAction: '添加养老院',
@@ -95,6 +114,7 @@ export default {
   created () {
     this.columns = this.getColumns()
     this.getHouseList()
+    this.getAddressList()
   },
   mounted () {
     Helper.windowOnResize(this, this.fixLayout)
@@ -132,9 +152,16 @@ export default {
         prop: 'lat',
         align: 'center'
       }, {
+        label: '联系人',
+        prop: 'contact',
+        align: 'center'
+      }, {
+        label: '联系电话',
+        prop: 'phone',
+        align: 'center'
+      }, {
         label: '操作',
         align: 'center',
-        minWidth: '180px',
         renderBody: this.getToolboxRender
       }]
     },
@@ -165,6 +192,11 @@ export default {
         this.tableLoading = false
       })
     },
+    getAddressList () {
+      SystemAPI.getAddressList().then(res => {
+        this.addressOptions = res.data.records
+      })
+    },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
       this.getHouseList()
@@ -177,18 +209,56 @@ export default {
 
     },
     handleSearch () {
-
+      this.getHouseList()
     },
     handleCreate () {
       this.createDialogVisible = true
+      this.dialogAction = '添加养老院'
     },
     createHouse () {
-
+      this.$refs.houseForm.validate(valid => {
+        if (valid) {
+          HouseAPI.createHouse(this.houseModel).then(res => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: res.msg || '养老院创建成功'
+              })
+              this.createDialogVisible = false
+              this.getHouseList()
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.msg || '养老院创建失败'
+              })
+            }
+          }).catch(err => {
+            this.$message({
+              type: 'error',
+              message: '服务异常' + err
+            })
+          })
+        }
+      })
     },
-    handleEdit () {
-
+    handleEdit (row) {
+      this.dialogAction = '编辑养老院'
+      this.createDialogVisible = true
+      this.houseModel = row
     },
-    handleDelete () {
+    handleDelete (row) {
+      this.$confirm('确认删除养老院？', '确认提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        this.doRemove(row.scene_number)
+      }).catch(() => {
+        console.log('取消删除')
+      })
+    },
+    doDelete (row) {
 
     }
   }
@@ -201,5 +271,15 @@ export default {
 }
 .w8{
   width: 80%;
+}
+.address .detail{
+  width: 47%;
+  margin-left: 5px;
+}
+.coors .caption-item{
+  width: 39%;
+}
+.coors .caption-item:last-of-type{
+  margin-left: 12px;
 }
 </style>

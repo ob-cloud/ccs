@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:33
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 10:30:48
+ * @Last Modified time: 2019-09-20 14:53:42
  */
 
 const _toString = Object.prototype.toString
@@ -120,7 +120,19 @@ export const Helper = {
         })()
       }
     }, 0)
-  }
+  },
+  responseHandler (res, msg) {
+    let message = `${msg}失败`
+    let type = 'error'
+    if (res.code === 0) {
+      type = 'success'
+      message = `${msg}成功`
+    }
+    this.$message({
+      type,
+      message
+    })
+  },
 }
 
 export default Helper

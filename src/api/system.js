@@ -2,13 +2,16 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-02-19 10:36:55
+ * @Last Modified time: 2019-09-20 14:31:49
  */
 
 import request from '@/common/fetch'
 
 
 const SystemAPI = {
+  getAddressList () {
+    return request.get('/common/address')
+  },
   login (account, password) {
     return request.post({
       url: 'login',

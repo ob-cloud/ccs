@@ -12,6 +12,12 @@ const HouseAPI = {
   },
   getHouseList () {
     return request.get('beadhouse/list', {})
+  },
+  createHouse (house) {
+    return request.post({
+      url: '/beadhouse/create',
+      params: house
+    })
   }
 }
 export default HouseAPI
