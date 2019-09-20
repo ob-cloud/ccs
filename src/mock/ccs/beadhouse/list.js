@@ -1,6 +1,4 @@
-/* eslint-disable */
-const Mock = require('mockjs')
-Mock.mock('/beadhouse/list', {
+{
   "code": 0,
   "msg": "获取成功",
   "data": {
@@ -18,4 +16,4 @@ Mock.mock('/beadhouse/list', {
       return this.records.length
     }
   }
-})
+}

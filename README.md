@@ -1,6 +1,6 @@
 # ccs
 
-> A Vue Admin Template
+> ccs
 
 ## Project setup
 ```
