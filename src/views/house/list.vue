@@ -13,8 +13,7 @@
       <slot>
         <template slot="caption">
           <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="养老院/社区名称" v-model="search.name"></el-input>
-          <el-select clearable class="caption-item w8" placeholder="类型" v-model="search.type">
-            <el-option label='全部' value=''></el-option>
+          <el-select clearable class="caption-item w8" placeholder="机构类型" v-model="search.type">
             <el-option label='养老院' :value='0'></el-option>
             <el-option label='社区' :value='1'></el-option>
           </el-select>

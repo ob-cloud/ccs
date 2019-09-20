@@ -112,7 +112,7 @@ export default {
         prop: 'contacts',
         align: 'center'
       }, {
-        label: '联系号码',
+        label: '联系人号码',
         prop: 'contactsPhone',
         align: 'center'
       }, {
