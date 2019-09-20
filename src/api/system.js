@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 14:31:49
+ * @Last Modified time: 2019-09-20 16:56:42
  */
 
 import request from '@/common/fetch'
@@ -11,6 +11,15 @@ import request from '@/common/fetch'
 const SystemAPI = {
   getAddressList () {
     return request.get('/common/address')
+  },
+  getNactionList () {
+    return request.get('/dict/nation/list')
+  },
+  getBloodTypeList () {
+    return request.get('/dict/blood/list')
+  },
+  getMedicalList () {
+    return request.get('/dict/disease/list')
   },
   login (account, password) {
     return request.post({
@@ -37,22 +46,6 @@ const SystemAPI = {
     return request.post({
       url: 'resetPassword',
       params
-    })
-  },
-  // 获取七牛token
-  getQiniuToken () {
-    return request.post({
-      url: 'getQiniuToken'
-    })
-  },
-  /**
-   * 根据key获取七牛图片访问url
-   * @param {String} key 七牛key
-   */
-  getReqUrlByQiniuKey (key) {
-    return request.post({
-      url: 'qiniu/url',
-      params: {key}
     })
   }
 }
