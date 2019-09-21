@@ -8,7 +8,7 @@ import {
 
 // import Storage from '@/common/cache'
 // import SysMenuAPI from '@/api/menu'
-import { systemtMenus } from '@/router/menu'
+import { systemtMenus, sidebarMenusHouse } from '@/router/menu'
 import store from '@/store'
 
 const menu = {
@@ -38,14 +38,21 @@ const menu = {
   },
   actions: {
     generateSidebarMenu ({ commit }) {
-      // return new Promise(resolve => {
-      //   store.dispatch('getUserInfo').then(userInfo => {
-      //     commit('SET_SIDEBAR_MENU_LIST', userInfo.type === 1 ? merchantMenus : operatorMenus)
-      //     resolve(userInfo)
-      //   }).catch(() => {
-      //     commit('SET_SIDEBAR_MENU_LIST', [])
-      //   })
-      // })
+      return new Promise(resolve => {
+        commit('SET_SIDEBAR_MENU_LIST', sidebarMenusHouse)
+        // store.dispatch('getUserInfo').then(userInfo => {
+        //   commit('SET_SIDEBAR_MENU_LIST', userInfo.type === 1 ? merchantMenus : operatorMenus)
+        //   resolve(userInfo)
+        // }).catch(() => {
+        //   commit('SET_SIDEBAR_MENU_LIST', [])
+        // })
+      })
+    },
+    generateNavSubMenu ({ commit }) {
+      return new Promise(resolve => {
+        commit('SET_SIDEBAR_MENU_LIST', sidebarMenusHouse)
+        resolve(sidebarMenusHouse)
+      })
     },
     generateNavibarMenu ({ commit }) {
       return new Promise(resolve => {
@@ -73,6 +80,9 @@ const menu = {
     },
     updateMenuNavActiveName ({ commit }, activeName) {
       commit('UPDATE_MENU_NAV_ACTIVE_NAME', activeName)
+    },
+    updateSidebarMenuActiveName ({ commit }, activeName) {
+      commit('UPDATE_SIDEBAR_MENU_ACTIVE_NAME', activeName)
     }
   }
 }

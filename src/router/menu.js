@@ -6,6 +6,42 @@ export const merchantMenus = [
 
 ]
 
+export const sidebarMenusHouse = [
+  {
+    id: 1,
+    name: '养老院管理',
+    path: '/house/list.html'
+  },
+  // {
+  //   id: 1,
+  //   name: '养老院管理',
+  //   path: '/house',
+  //   children: [{
+  //     id: 9,
+  //     name: '养老院列表',
+  //     path: '/house/list.html'
+  //   }]
+  // }, {
+  //   id: 2,
+  //   name: '社区管理',
+  //   path: '/community',
+  //   children: [{
+  //     id: 9,
+  //     name: '养老院列表',
+  //     path: '/community/list.html'
+  //   }]
+  // },
+  {
+    id: 31,
+    name: '房间管理',
+    path: '/room/index.html'
+  }, {
+    id: 3,
+    name: '房型管理',
+    path: '/roomtype/index.html'
+  }
+]
+
 export const systemtMenus = [
   {
     id: 1,

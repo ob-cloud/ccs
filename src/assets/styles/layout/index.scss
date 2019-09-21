@@ -11,20 +11,45 @@
   background-color: #fff;
 }
 
+
 @import './brand.scss';
 @import './navbar.scss';
+
+.app-sidebar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: $sidebar-width;
+  height: 100%;
+  overflow: hidden;
+}
+
+@import './sidebar.scss';
 
 /*
  * Content Wrapper - contains the main content
  */
+.app-body{
+  margin-left: $sidebar-width;
+  .app-main{
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+}
+.app-main {
+  width: 100%;
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
 
- .app-main{
-   width: 100%;
-   position: relative;
-   overflow-x: hidden;
-   overflow-y: auto;
-
-   .app-container{
-     padding: 10px;
-   }
- }
+  .app-sidebar{
+    top: $navbar-height;
+  }
+  .app-main{
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .app-container {
+    padding: 10px;
+  }
+}

@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:33
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 14:53:42
+ * @Last Modified time: 2019-09-21 19:21:02
  */
 
 const _toString = Object.prototype.toString
@@ -109,7 +109,7 @@ export const Helper = {
     const navH = 50
     const searchBarH = document.querySelector('.el-table-plus__header').clientHeight
     const paginationH = 60
-    return winH - navH - searchBarH - paginationH - 50
+    return winH - navH - searchBarH - paginationH - 40
   },
   windowOnResize (context, fn) {
     setTimeout(() => {
