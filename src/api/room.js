@@ -24,6 +24,12 @@ const RoomAPI = {
       url: '/room/delete',
       params: {id}
     })
+  },
+  connectDevice (params) {
+    return request.post({
+      url: 'room/device',
+      ...params
+    })
   }
 }
 export default RoomAPI

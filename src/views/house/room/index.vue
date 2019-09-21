@@ -67,12 +67,35 @@
         <el-button type="primary" @click="createHouse">确 认</el-button>
       </div>
     </el-dialog>
+
+    <el-dialog top="10%" width="760px" title="绑定设备" :visible.sync="bindingDialogVisible" :close-on-click-modal="false">
+      <el-form ref="bindingForm" :rules="bindingModelRules" :model="bindingModel" label-width="100px">
+        <el-form-item label="房号">
+          <el-input class="caption-item w8" placeholder="房号" disabled v-model="bindingModel.room"></el-input>
+        </el-form-item>
+        <el-form-item label="设备" prop="deviceId">
+          <el-select clearable class="caption-item w8" placeholder="选择设备" v-model="bindingModel.deviceId">
+            <el-option :label='item.name' :value='item.id' v-for="(item, index) in deviceList" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="床" prop="bedNo">
+          <el-radio-group v-model="bindingModel.bedNo">
+             <el-radio-button type="plain" :label="item.no" v-for="(item, index) in bingdingBedList" :key="index">{{item.no}}</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer text-center" >
+        <el-button @click="bindingDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="connectDevice">确 认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import BaseTable from '@/assets/package/table-base'
 import RoomAPI from '@/api/room'
+import DeviceAPI from '@/api/device'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
 export default {
@@ -121,7 +144,19 @@ export default {
         beds: [{ required: true, trigger: 'blur', validator: validateBeds}]
       },
       dialogAction: '添加房间',
-      createDialogVisible: false
+      createDialogVisible: false,
+      bindingDialogVisible: false,
+      bindingModel: {
+        room: '',
+        roomId: '',
+        deviceId: '',
+        bedNo: ''
+      },
+      bindingModelRules: {
+        deviceId: [{ required: true, trigger: 'blur', message: '请选择设备'}]
+      },
+      bingdingBedList: [],
+      deviceList: []
     }
   },
   computed: {
@@ -176,6 +211,7 @@ export default {
     },
     getToolboxRender (h, row) {
       return [
+        <el-button size="tiny" icon="el-icon-connection" onClick={() => this.handleConnect(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
       ]
@@ -199,6 +235,13 @@ export default {
           type: 'error'
         })
         this.tableLoading = false
+      })
+    },
+    getDeviceList () {
+      DeviceAPI.getDeviceList().then(resp => {
+        if (resp.code === 0) {
+          this.deviceList = resp.data.records
+        }
       })
     },
     onCurrentChange (pageNo) {
@@ -237,6 +280,39 @@ export default {
               this.$message({
                 type: 'error',
                 message: res.msg || '房间创建失败'
+              })
+            }
+          }).catch(err => {
+            this.$message({
+              type: 'error',
+              message: '服务异常' + err
+            })
+          })
+        }
+      })
+    },
+    handleConnect (row) {
+      this.bindingDialogVisible = true
+      this.bingdingBedList = row.bed
+      this.bindingModel.room = row.room
+      this.bindingModel.roomId = row.roomId
+      !this.deviceList.length && this.getDeviceList()
+    },
+    connectDevice () {
+      this.$refs.bindingForm.validate(valid => {
+        if (valid) {
+          RoomAPI.connectDevice(this.bindingModel).then(res => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: res.msg || '设备绑定成功'
+              })
+              this.bindingDialogVisible = false
+              this.getRoomList()
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.msg || '设备绑定失败'
               })
             }
           }).catch(err => {
