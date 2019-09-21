@@ -33,7 +33,7 @@
     </el-dialog>
 
     <el-dialog top="10%" width="760px" title="安排入住" :visible.sync="checkinDialogVisible" :close-on-click-modal="false">
-      <el-form ref="checkInForm" :rules="checkInModelRules" :model="checkInModel" label-width="100px">
+      <el-form ref="checkInForm" :model="checkInModel" label-width="100px">
         <el-form-item label="姓名">
           <el-input class="caption-item w8" placeholder="老人姓名" disabled v-model="checkInModel.elder"></el-input>
         </el-form-item>
