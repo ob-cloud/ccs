@@ -31,12 +31,38 @@
     <el-dialog top="10%" width="85%" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
       <elder-create :model="elderModel" @data-ready="createElder" @close="flag => createDialogVisible = flag"></elder-create>
     </el-dialog>
+
+    <el-dialog top="10%" width="760px" title="安排入住" :visible.sync="checkinDialogVisible" :close-on-click-modal="false">
+      <el-form ref="checkInForm" :rules="checkInModelRules" :model="checkInModel" label-width="100px">
+        <el-form-item label="姓名">
+          <el-input class="caption-item w8" placeholder="老人姓名" disabled v-model="checkInModel.elder"></el-input>
+        </el-form-item>
+        <el-form-item label="养老院">
+          <el-input class="caption-item w8" placeholder="养老院" v-model="checkInModel.houseName"></el-input>
+        </el-form-item>
+        <el-form-item label="房间" prop="roomId">
+          <el-select clearable class="caption-item w8" placeholder="选择房间" v-model="checkInModel.roomId" @change="onChangeRoom">
+            <el-option :label='item.name' :value='item.id' v-for="(item, index) in roomList" :key="index"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="床" prop="bedNo">
+          <el-radio-group v-model="checkInModel.bedNo">
+             <el-radio-button type="plain" :label="item.no" v-for="(item, index) in bedList" :key="index">{{item.no}}</el-radio-button>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer text-center" >
+        <el-button @click="checkinDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="doCheckIn">确 认</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import BaseTable from '@/assets/package/table-base'
 import ElderAPI from '@/api/elder'
+import RoomAPI from '@/api/room'
 import elderCreate from './create/index'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
@@ -57,7 +83,15 @@ export default {
       columns: [],
       createDialogVisible: false,
       dialogAction: '添加老人',
-      elderModel: null
+      elderModel: null,
+      roomList: [],
+      bedList: [],
+      checkInModel: {
+        elder: '',
+        houseName: '',
+        roomId: '',
+        bedNo: ''
+      }
     }
   },
   components: { BaseTable, elderCreate },
@@ -139,6 +173,7 @@ export default {
     },
     getToolboxRender (h, row) {
       return [
+        <el-button size="tiny" icon="el-icon-s-help" onClick={() => this.handleCheckIn(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
       ]
@@ -163,6 +198,17 @@ export default {
         })
         this.tableLoading = false
       })
+    },
+    getRoomList () {
+      RoomAPI.getRoomList().then(resp => {
+        if (resp.code === 0) {
+          this.roomList = resp.data.records
+
+        }
+      })
+    },
+    onChangeRoom (room) {
+      this.bedList = room.bed
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
@@ -201,6 +247,35 @@ export default {
           type: 'error',
           message: '服务异常' + err
         })
+      })
+    },
+    handleCheckIn (row) {
+      this.checkinDialogVisible = true
+    },
+    doCheckIn () {
+      this.$refs.checkInForm.validate(valid => {
+        if (valid) {
+          ElderAPI.checkIn(this.checkInModel).then(res => {
+            if (res.code === 0) {
+              this.$message({
+                type: 'success',
+                message: res.msg || '安排入住成功'
+              })
+              this.createDialogVisible = false
+              this.getElderList()
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.msg || '入住失败'
+              })
+            }
+          }).catch(err => {
+            this.$message({
+              type: 'error',
+              message: '服务异常' + err
+            })
+          })
+        }
       })
     },
     handleEdit (row) {

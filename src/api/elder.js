@@ -21,6 +21,13 @@ const ElderAPI = {
       url: '/elder/create',
       params: {id}
     })
+  },
+  checkIn (params) {
+    return request.post({
+      url: 'checkin/create',
+      ...params
+    })
+
   }
 }
 export default ElderAPI
