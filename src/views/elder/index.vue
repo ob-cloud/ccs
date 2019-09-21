@@ -29,11 +29,7 @@
       </slot>
     </base-table>
     <el-dialog top="10%" width="85%" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
-      <elder-create></elder-create>
-      <div slot="footer" class="dialog-footer text-center" >
-        <el-button @click="createDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="createElder">确 认</el-button>
-      </div>
+      <elder-create @data-ready="createElder" @close="flag => createDialogVisible = flag"></elder-create>
     </el-dialog>
   </div>
 </template>
@@ -43,10 +39,12 @@ import BaseTable from '@/assets/package/table-base'
 import ElderAPI from '@/api/elder'
 import elderCreate from './create/index'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
+import Helper from '@/common/helper'
 export default {
   data () {
     return {
       tableLoading: true,
+      tableHeight: 0,
       search: {
         name: '',
         type: '',
@@ -61,19 +59,17 @@ export default {
       dialogAction: '添加老人',
     }
   },
-  computed: {
-    tableHeight () {
-      return document.body.clientHeight - 50 - 60 - 40
-    }
-  },
   components: { BaseTable, elderCreate },
   created () {
     this.columns = this.getColumns()
     this.getElderList()
   },
+  mounted () {
+    Helper.windowOnResize(this, this.fixLayout)
+  },
   methods: {
     fixLayout () {
-
+      this.tableHeight = Helper.calculateTableHeight()
     },
     getColumns () {
       return [{
@@ -183,8 +179,9 @@ export default {
       this.dialogAction = '添加老人'
       this.elderModel = {}
     },
-    createElder () {
-
+    createElder (model, dialogVisible) {
+      console.log('eldermodel', model)
+      this.createDialogVisible = dialogVisible
     },
     handleEdit (row) {
       this.createDialogVisible = true
@@ -202,14 +199,5 @@ export default {
 .content{
   padding: 20px;
 }
-.w8{
-  width: 80%;
-}
-.caption-item.gutter{
-  width: 100%;
-}
-.checkbox.el-checkbox.is-bordered.el-checkbox--small{
-  margin-right: 10px;
-  margin-left: 0!important;
-}
+
 </style>

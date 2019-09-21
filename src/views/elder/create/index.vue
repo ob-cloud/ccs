@@ -208,6 +208,10 @@
           </el-tab-pane>
         </el-tabs>
       </el-form>
+      <div class="footer">
+        <el-button @click="close">取 消</el-button>
+        <el-button type="primary" @click="createElder">确 认</el-button>
+      </div>
   </div>
 </template>
 
@@ -249,7 +253,13 @@ export default {
       },
       medicalHistory: [],
       elderModelRules: {
-
+        name: [{ required: true, trigger: 'blur', message: '姓名不能为空'}],
+        gender: [{ required: true, trigger: 'blur', message: '性别不能为空'}],
+        nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
+        idcard: [{ required: true, trigger: 'blur', message: '身份证不能为空'}],
+        birthday: [{ required: true, trigger: 'blur', message: '生日不能为空'}],
+        age: [{ required: true, trigger: 'blur', message: '年龄不能为空'}],
+        address: [{ required: true, trigger: 'blur', message: '居住地址不能为空'}]
       }
     }
   },
@@ -280,10 +290,33 @@ export default {
         }
       })
     },
+    createElder () {
+      this.$refs.elderForm.validate(valid => {
+        if (valid) {
+          this.$emit('data-ready', this.elderModel, false)
+        }
+      })
+    },
+    close () {
+      this.$emit('close', false)
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
-
+.w8{
+  width: 80%;
+}
+.caption-item.gutter{
+  width: 100%;
+}
+.checkbox.el-checkbox.is-bordered.el-checkbox--small{
+  margin-right: 10px;
+  margin-left: 0!important;
+}
+.footer{
+  padding: 20px 0;
+  text-align: right;
+}
 </style>

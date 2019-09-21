@@ -226,5 +226,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+.w8{
+  width: 80%;
+}
+.caption-item.gutter{
+  width: 100%;
+}
+.checkbox.el-checkbox.is-bordered.el-checkbox--small{
+  margin-right: 10px;
+  margin-left: 0!important;
+}
 </style>
