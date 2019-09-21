@@ -42,7 +42,7 @@
         </el-form-item>
         <el-form-item label="房间" prop="roomId">
           <el-select clearable class="caption-item w8" placeholder="选择房间" v-model="checkInModel.roomId" @change="onChangeRoom">
-            <el-option :label='item.name' :value='item.id' v-for="(item, index) in roomList" :key="index"></el-option>
+            <el-option :label='room.room' :value='room.id' v-for="(room, index) in roomList" :key="index"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="床" prop="bedNo">
@@ -84,6 +84,7 @@ export default {
       createDialogVisible: false,
       dialogAction: '添加老人',
       elderModel: null,
+      checkinDialogVisible: false,
       roomList: [],
       bedList: [],
       checkInModel: {
@@ -203,12 +204,12 @@ export default {
       RoomAPI.getRoomList().then(resp => {
         if (resp.code === 0) {
           this.roomList = resp.data.records
-
         }
       })
     },
-    onChangeRoom (room) {
-      this.bedList = room.bed
+    onChangeRoom (roomId) {
+      const room = this.roomList.find(room => room.id === roomId)
+      this.bedList = room ? room.bed : []
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
@@ -251,6 +252,7 @@ export default {
     },
     handleCheckIn (row) {
       this.checkinDialogVisible = true
+      !this.roomList.length && this.getRoomList()
     },
     doCheckIn () {
       this.$refs.checkInForm.validate(valid => {
