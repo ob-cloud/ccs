@@ -2,17 +2,19 @@
  * @Author: eamiear
  * @Date: 2019-09-18 18:02:46
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 19:20:17
+ * @Last Modified time: 2019-09-21 22:30:01
  */
 
-const house = [
+const home = [
   {
     name: '/house/index.html',
     path: '/house/index.html',
     desc: '首页',
     component: () => import('views/house/index.vue'),
     isShow: true
-  },
+  }
+]
+const house = [
   {
     name: '/house/list.html',
     path: '/house/list.html',
@@ -43,9 +45,9 @@ const roomtype = [
 
 export default [
   {
-    name: 'house',
-    path: '/house',
-    desc: '侧边栏布局',
+    name: '/house.html',
+    path: '/house.html',
+    desc: '养老院',
     component: () => import('views/layout/SidebarLayout.vue'),
     redirect: { path: '/house/list.html' },
     children: [
@@ -53,5 +55,6 @@ export default [
       ...room,
       ...roomtype
     ]
-  }
+  },
+  ...home
 ]

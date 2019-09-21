@@ -64,3 +64,8 @@ export default {
   }
 }
 </script>
+<style lang="css" scoped>
+.app-body{
+  margin-left: 230px;
+}
+</style>

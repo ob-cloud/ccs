@@ -51,7 +51,7 @@ export const systemtMenus = [
   }, {
     id: 2,
     name: '社区养老院',
-    path: '/house/list.html'
+    path: '/house.html'
   }, {
     id: 31,
     name: '老人管理',
