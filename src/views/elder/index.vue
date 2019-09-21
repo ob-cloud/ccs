@@ -29,7 +29,7 @@
       </slot>
     </base-table>
     <el-dialog top="10%" width="85%" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
-      <elder-create @data-ready="createElder" @close="flag => createDialogVisible = flag"></elder-create>
+      <elder-create :model="elderModel" @data-ready="createElder" @close="flag => createDialogVisible = flag"></elder-create>
     </el-dialog>
   </div>
 </template>
@@ -57,6 +57,7 @@ export default {
       columns: [],
       createDialogVisible: false,
       dialogAction: '添加老人',
+      elderModel: null
     }
   },
   components: { BaseTable, elderCreate },
@@ -180,12 +181,31 @@ export default {
       this.elderModel = {}
     },
     createElder (model, dialogVisible) {
-      console.log('eldermodel', model)
-      this.createDialogVisible = dialogVisible
+      this.elderModel = model
+      ElderAPI.createElder(this.elderModel).then(res => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: res.msg || '老人创建成功'
+          })
+          this.createDialogVisible = dialogVisible
+          this.getElderList()
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.msg || '老人创建失败'
+          })
+        }
+      }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: '服务异常' + err
+        })
+      })
     },
     handleEdit (row) {
-      this.createDialogVisible = true
       this.dialogAction = '编辑老人'
+      this.createDialogVisible = true
       this.elderModel = {...row}
     },
     handleDelete () {

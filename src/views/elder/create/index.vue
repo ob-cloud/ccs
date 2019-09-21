@@ -44,6 +44,7 @@
                     class="caption-item gutter"
                     v-model="elderModel.birthday"
                     type="date"
+                    value-format="yyyy-MM-dd"
                     placeholder="选择出生日期">
                   </el-date-picker>
                 </el-form-item>
@@ -131,6 +132,7 @@
                     class="caption-item gutter"
                     v-model="elderModel.checkInTime"
                     type="date"
+                    value-format="yyyy-MM-dd"
                     placeholder="选择入院时间">
                   </el-date-picker>
                 </el-form-item>
@@ -218,6 +220,12 @@
 <script>
 import SystemAPI from '@/api/system'
 export default {
+  props: {
+    model: {
+      type: Object,
+      default: () => {}
+    }
+  },
   data () {
     return {
       nationList: [],
@@ -227,7 +235,7 @@ export default {
       elderModel: {
         id: '',
         name: '',
-        gender: 1,
+        gender: 0,
         nation: '',
         idcard: '',
         birthday: '',
@@ -255,7 +263,7 @@ export default {
       elderModelRules: {
         name: [{ required: true, trigger: 'blur', message: '姓名不能为空'}],
         gender: [{ required: true, trigger: 'blur', message: '性别不能为空'}],
-        nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
+        // nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
         idcard: [{ required: true, trigger: 'blur', message: '身份证不能为空'}],
         birthday: [{ required: true, trigger: 'blur', message: '生日不能为空'}],
         age: [{ required: true, trigger: 'blur', message: '年龄不能为空'}],
@@ -264,6 +272,9 @@ export default {
     }
   },
   mounted () {
+    if (this.model) {
+      this.elderModel = {...this.model}
+    }
     this.getNationList()
     this.getBloodTypeList()
     this.getMedicalList()
