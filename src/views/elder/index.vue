@@ -208,8 +208,38 @@ export default {
       this.createDialogVisible = true
       this.elderModel = {...row}
     },
-    handleDelete () {
-
+    handleDelete (row) {
+      this.$confirm('确认删除老人？', '确认提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        this.doDelete(row.id)
+      }).catch(() => {
+        console.log('取消删除')
+      })
+    },
+    doDelete (id) {
+      ElderAPI.deleteElder(id).then(res => {
+        if (res.code === 0) {
+          this.$message({
+            type: 'success',
+            message: res.msg || '老人删除成功'
+          })
+          this.getHouseList()
+        } else {
+          this.$message({
+            type: 'error',
+            message: res.msg || '老人删除失败'
+          })
+        }
+      }).catch(err => {
+        this.$message({
+          type: 'error',
+          message: '服务异常' + err
+        })
+      })
     }
   }
 }

@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-19 23:34:23
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 17:59:21
+ * @Last Modified time: 2019-09-21 18:02:34
  */
 import request from '@/common/fetch'
 
@@ -14,6 +14,12 @@ const ElderAPI = {
     return request.post({
       url: '/elder/create',
       params: elder
+    })
+  },
+  deleteElder (id) {
+    return request.post({
+      url: '/elder/create',
+      params: {id}
     })
   }
 }
