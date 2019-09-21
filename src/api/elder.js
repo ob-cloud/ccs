@@ -2,13 +2,13 @@
  * @Author: eamiear
  * @Date: 2019-09-19 23:34:23
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 18:02:34
+ * @Last Modified time: 2019-09-21 21:46:07
  */
 import request from '@/common/fetch'
 
 const ElderAPI = {
-  getElderList () {
-    return request.get('elder/list', {})
+  getElderList (params) {
+    return request.get('elder/list', {...params})
   },
   createElder (elder) {
     return request.post({

@@ -2,32 +2,32 @@
  * @Author: eamiear
  * @Date: 2019-09-19 22:07:27
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 15:14:09
+ * @Last Modified time: 2019-09-21 21:53:04
  */
 import request from '@/common/fetch'
 
 const HouseAPI = {
-  getHouseElderList () {
-    return request.get('beadhouse/elder/list', {})
+  getHouseElderList (params) {
+    return request.get('beadhouse/elder/list', {...params})
   },
-  getHouseList () {
-    return request.get('beadhouse/list', {})
+  getHouseList (params) {
+    return request.get('beadhouse/list', {...params})
   },
   createHouse (house) {
     return request.post({
-      url: '/beadhouse/create',
+      url: 'beadhouse/create',
       params: house
     })
   },
   updateHouse (house) {
     return request.post({
-      url: '/beadhouse/update',
+      url: 'beadhouse/update',
       params: house
     })
   },
   deleteHouse (id) {
     return request.post({
-      url: '/beadhouse/delete',
+      url: 'beadhouse/delete',
       params: {id}
     })
   }
