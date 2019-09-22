@@ -10,6 +10,15 @@
       :pageSize="search.pageSize"
       @on-current-page-change="onCurrentChange"
       @on-page-size-change="onSizeChange">
+      <slot>
+        <template slot="caption">
+          <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="设备名" v-model="search.name"></el-input>
+          <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
+        </template>
+        <template slot="actionBar">
+          <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加设备</el-button>
+        </template>
+      </slot>
     </base-table>
   </div>
 </template>
@@ -18,9 +27,11 @@
 import BaseTable from '@/assets/package/table-base'
 import DeviceAPI from '@/api/device'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
+import Helper from '@/common/helper'
 export default {
   data () {
     return {
+      tableHeight: 0,
       tableLoading: true,
       search: {
         pageNo: PAGINATION_PAGENO,
@@ -31,17 +42,18 @@ export default {
       columns: []
     }
   },
-  computed: {
-    tableHeight () {
-      return document.body.clientHeight - 50 - 60 - 40
-    }
-  },
   components: { BaseTable },
   created () {
     this.columns = this.getColumns()
     this.getDeviceList()
   },
+  mounted () {
+    Helper.windowOnResize(this, this.fixLayout)
+  },
   methods: {
+    fixLayout () {
+      this.tableHeight = Helper.calculateTableHeight()
+    },
     getColumns () {
       return [{
         label: '序号',
@@ -93,6 +105,12 @@ export default {
     onSizeChange (pageSize) {
       this.search.pageSize = pageSize
       this.getDeviceList()
+    },
+    handleSearch () {
+      this.getDeviceList()
+    },
+    handleCreate () {
+
     }
   }
 }

@@ -5,7 +5,7 @@ export const PERMISSION_BUTTON_KEY = 'mip.web.sys:permission:key'
 
 
 export const PAGINATION_PAGENO = 1
-export const PAGINATION_PAGESIZE = 50
+export const PAGINATION_PAGESIZE = 10
 export const PAGINATION_PAGETOTAL = 0
 
 //
