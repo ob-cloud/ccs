@@ -64,7 +64,7 @@ export const systemtMenus = [
     id: 1,
     name: '首页',
     default: true,
-    path: '/dashbaord.html'
+    path: '/dashboard.html'
   }, {
     id: 2,
     name: '社区养老院',

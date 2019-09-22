@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:06:02
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-19 18:17:07
+ * @Last Modified time: 2019-09-22 16:11:19
  */
 
 import common from './common'
@@ -15,7 +15,7 @@ const menuRoutes = {
   path: '/',
   desc: '首页',
   component: () => import('views/layout/Layout.vue'),
-  redirect: { path: '/house/index.html' },
+  redirect: { path: '/dashboard.html' },
   children: [
     ...system,
     ...house,
