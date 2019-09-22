@@ -8,7 +8,7 @@ import {
 
 // import Storage from '@/common/cache'
 // import SysMenuAPI from '@/api/menu'
-import { systemtMenus, sidebarMenusHouse } from '@/router/menu'
+import { systemtMenus, sidebarMenusHouse, NurseSidebarMenu } from '@/router/menu'
 import store from '@/store'
 
 const menu = {
@@ -48,9 +48,9 @@ const menu = {
         // })
       })
     },
-    generateNavSubMenu ({ commit }) {
+    generateNavSubMenu ({ commit }, type) {
       return new Promise(resolve => {
-        commit('SET_SIDEBAR_MENU_LIST', sidebarMenusHouse)
+        commit('SET_SIDEBAR_MENU_LIST', type === 'nurse' ? NurseSidebarMenu : sidebarMenusHouse)
         resolve(sidebarMenusHouse)
       })
     },

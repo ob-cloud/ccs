@@ -208,7 +208,7 @@ export default {
       })
     },
     onChangeRoom (roomId) {
-      const room = this.roomList.find(room => room.id === roomId)
+      const room = this.roomList.find(roomItem => roomItem.id === roomId)
       this.bedList = room ? room.bed : []
     },
     onCurrentChange (pageNo) {

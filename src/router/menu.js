@@ -42,16 +42,33 @@ export const sidebarMenusHouse = [
   }
 ]
 
+export const NurseSidebarMenu = [
+  {
+    id: 1,
+    name: '护工列表',
+    path: '/nurse/index.html'
+  },
+  {
+    id: 2,
+    name: '排班计划',
+    path: '/nurse/schedule/index.html'
+  }, {
+    id: 3,
+    name: '日常护理',
+    path: '/nurse/task/index.html'
+  }
+]
+
 export const systemtMenus = [
   {
     id: 1,
     name: '首页',
     default: true,
-    path: '/house/index.html'
+    path: '/dashbaord.html'
   }, {
     id: 2,
     name: '社区养老院',
-    path: '/house.html'
+    path: '/house/list.html'
   }, {
     id: 31,
     name: '老人管理',

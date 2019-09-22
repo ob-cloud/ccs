@@ -33,6 +33,9 @@ export default {
   watch: {
     $route: 'routerHandler'
   },
+  mounted () {
+    this.$emit('on-sysmenu-change', this.$route)
+  },
   methods: {
     menuEvent (path, router) {
       const routeName = path
@@ -44,6 +47,7 @@ export default {
     },
     routerHandler (route) {
       this.navMenuActiveName = `${route.name}`
+      this.$emit('on-sysmenu-change', route)
     }
   },
 }

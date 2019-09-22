@@ -2,13 +2,13 @@
  * @Author: eamiear
  * @Date: 2019-09-18 18:02:46
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 22:30:01
+ * @Last Modified time: 2019-09-22 14:33:56
  */
 
 const home = [
   {
-    name: '/house/index.html',
-    path: '/house/index.html',
+    name: '/dashbaord.html',
+    path: '/dashbaord.html',
     desc: '首页',
     component: () => import('views/house/index.vue'),
     isShow: true

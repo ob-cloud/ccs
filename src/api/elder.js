@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-19 23:34:23
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 21:46:07
+ * @Last Modified time: 2019-09-22 11:47:05
  */
 import request from '@/common/fetch'
 
@@ -27,7 +27,6 @@ const ElderAPI = {
       url: 'checkin/create',
       ...params
     })
-
   }
 }
 export default ElderAPI

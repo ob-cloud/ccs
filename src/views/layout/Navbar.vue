@@ -3,7 +3,7 @@
     <ura-brand></ura-brand>
     <nav class="navbar navbar-static-top is-dialog">
       <div class="navbar-custom-menu">
-        <ura-sys-menu class="sys-menu-nav"></ura-sys-menu>
+        <ura-sys-menu class="sys-menu-nav" @on-sysmenu-change="onSystemMenuChange"></ura-sys-menu>
         <el-dropdown trigger="click" class="uv-user-menu" @command="handleCommand">
           <el-button class="uv-menu-btn">
             <div class="user uv-user-menu">
@@ -134,6 +134,10 @@ export default {
           })
         }
       })
+    },
+    onSystemMenuChange (route) {
+      const routeType = Array.from(route.matched).find(item => item.meta.type)
+      this.$store.dispatch('generateNavSubMenu', routeType ? routeType.meta.type : '')
     }
   }
 }
