@@ -1,68 +1,162 @@
 <template>
-  <div class="nurse">
-    <el-button size="large" type="primary" class="msg" @click="sendMessage">发送消息</el-button>
-    护工管理开发中...
+  <div class="device">
+    <base-table
+      :height="tableHeight"
+      :tableData="tableData"
+      :columns="columns"
+      stripe border
+      v-loading="tableLoading"
+      :pageTotal="total"
+      :pageSize="search.pageSize"
+      @on-current-page-change="onCurrentChange"
+      @on-page-size-change="onSizeChange">
+      <slot>
+        <template slot="caption">
+          <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="护工姓名" v-model="search.name"></el-input>
+          <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
+        </template>
+        <template slot="actionBar">
+          <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加护工</el-button>
+        </template>
+      </slot>
+    </base-table>
   </div>
 </template>
 
 <script>
-import axios from 'axios'
-import QS from 'qs'
-// import Helper from '@/common/helper'
+import BaseTable from '@/assets/package/table-base'
+import NurseAPI from '@/api/nurse'
+import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
+import Helper from '@/common/helper'
 export default {
-  methods: {
-    sendMessage () {
-      // const time = Helper.parseTime(new Date().getTime(), '{h}:{i}')
-      let data = {
-        DeviceId: 26199,
-        UserId: 39186,
-        DeviceModel: 324,
-        Params: 'test for sos',
-        CmdCode: '8099',
-        Token: '4692DCAD9FA223418A35650A8AC98D854BC96715CADDA54B8F494BDEB96E470D'
+  data () {
+    return {
+      tableHeight: 0,
+      tableLoading: true,
+      search: {
+        name: '',
+        pageNo: PAGINATION_PAGENO,
+        pageSize: PAGINATION_PAGESIZE
+      },
+      total: 0,
+      tableData: [],
+      columns: [],
+      nurseModel: {
+
       }
-      data = QS.stringify(data)
-      axios({
-        method: 'post',
-        url: 'https://aliiot.on-bright.com/consumer/test/SendCommand',
-        data,
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+    }
+  },
+  components: { BaseTable },
+  created () {
+    this.columns = this.getColumns()
+    this.getNurseList()
+  },
+  mounted () {
+    Helper.windowOnResize(this, this.fixLayout)
+  },
+  methods: {
+    fixLayout () {
+      this.tableHeight = Helper.calculateTableHeight()
+    },
+    getColumns () {
+      return [{
+        label: '护工姓名',
+        prop: 'name',
+        align: 'center'
+      }, {
+        label: '性别',
+        prop: 'gender',
+        align: 'center',
+        formatter (val) {
+          const map = {
+            0: '男',
+            1: '女',
+            2: '其他'
+          }
+          return map[val]
         }
-      }).then(res => {
-        if (res.State === 0) {
-          this.$message({
-            message: '发送成功',
-            type: 'success'
-          })
+      }, {
+        label: '入职时间',
+        prop: 'hiredate',
+        align: 'center'
+      }, {
+        label: '离职时间',
+        prop: 'leavedate',
+        align: 'center'
+      }, {
+        label: '在职状态',
+        prop: 'status',
+        align: 'center',
+        formatter (val) {
+          return val === 0 ? '离职' : '在职'
+        }
+      }, {
+        label: '职称',
+        prop: 'rank',
+        align: 'center'
+      }, {
+        label: '看护老人',
+        prop: 'elder',
+        align: 'center'
+      }, {
+        label: '操作',
+        align: 'center',
+        renderBody: this.getToolboxRender
+      }]
+    },
+    getToolboxRender (h, row) {
+      return [
+        <el-button size="tiny" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
+        <el-button size="tiny" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
+      ]
+    },
+    getNurseList () {
+      this.tableLoading = true
+      NurseAPI.getNurseList(this.search).then(resp => {
+        if (resp.code === 0) {
+          this.tableData = resp.data.records
+          this.total = resp.data.total
         } else {
           this.$message({
-            message: res.Message || '发送失败',
-            type: 'error'
+            message: resp.message || '护工列表获取失败'
           })
         }
-      }).catch(() => {
+        this.tableLoading = false
+      }).catch(err => {
         this.$message({
-          message: '服务异常',
+          title: '失败',
+          message: err.message || '服务出错',
           type: 'error'
         })
+        this.tableLoading = false
       })
+    },
+    onCurrentChange (pageNo) {
+      this.search.pageNo = pageNo
+      this.getNurseList()
+    },
+    onSizeChange (pageSize) {
+      this.search.pageSize = pageSize
+      this.getNurseList()
+    },
+    handleSearch () {
+      this.getNurseList()
+    },
+    handleCreate () {
+
+    },
+    handleEdit () {
+
+    },
+    handleDelete () {
+
     }
   }
 }
 </script>
 
-<style lang="scss" scoped>
-.nurse{
-  text-align: center;
-  margin-top: 15%;
+<style scoped>
+.device{
   padding: 20px;
-  font-size: 20px;
-  color: #999;
-  position: relative;
-}
-.msg{
-  position: absolute;
-  top: -60px;
 }
 </style>

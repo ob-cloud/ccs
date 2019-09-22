@@ -1,3 +1,9 @@
+/*
+ * @Author: eamiear
+ * @Date: 2019-09-22 14:57:17
+ * @Last Modified by:   eamiear
+ * @Last Modified time: 2019-09-22 14:57:17
+ */
 import request from '@/common/fetch'
 
 const TaskAPI = {
