@@ -66,7 +66,9 @@ export default {
         lat: 23.3861140903
       },
       activeAnchor: 0,
-      activeFence: {}
+      activeFence: {
+        radius: 0
+      }
     }
   },
   // computed: {
@@ -101,8 +103,9 @@ export default {
       FenceAPI.getFenceList(this.search).then(resp => {
         if (resp.code === 0) {
           this.tableData = resp.data.records
-          // this.activeAnchor = 1
           this.activeAnchor = this.tableData[0].id
+          // this.activeFence = this.tableData[0]
+          // this.activeAnchor = this.tableData[0].id
           // this.center.lng = +this.tableData[0].lng
           // this.center.lat = +this.tableData[0].lat
         } else {
