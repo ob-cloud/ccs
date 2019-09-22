@@ -1,6 +1,6 @@
 <template>
   <a href="javascript:void(0)" class="brand" @click="dashboard">
-    <span class="brand-label">集中看护系统</span>
+    <span class="brand-label">昂宝养老看护系统</span>
   </a>
 </template>
 
