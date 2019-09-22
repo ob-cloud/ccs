@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:36:35
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 19:05:41
+ * @Last Modified time: 2019-09-22 17:02:06
  */
 export const COLLAPSE_SIDEBAR = 'COLLAPSE_SIDEBAR'
 export const UPDATE_DOCUMENT_CLIENT_HEIGHT = 'UPDATE_DOCUMENT_CLIENT_HEIGHT'
@@ -22,6 +22,7 @@ export const SET_INTRODUCTION = 'SET_INTRODUCTION'
 export const SET_NAME = 'SET_NAME'
 export const SET_AVATAR = 'SET_AVATAR'
 export const SET_USER_INFO = 'SET_USER_INFO'
+export const SET_PWD = 'SET_PWD'
 
 // message mutations
 export const SET_ALARM = 'SET_ALARM' // 养老院告警

@@ -1,52 +1,46 @@
 /*
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:07
- * @Last Modified by:   eamiear
- * @Last Modified time: 2019-02-19 10:38:07
+ * @Last Modified by: eamiear
+ * @Last Modified time: 2019-09-22 17:09:07
  */
 
-import { AUTHORITY_KEY, USER_TOKEN_KEY, USER_ID_KEY } from '@/common/constants'
-const Cacher = {
+import { USER_TOKEN_KEY } from '@/common/constants'
+class Cacher {
+  constructor (strategy) {
+    this.strategy = strategy || 'localStorage'
+  }
+  setStrategy (strategy) {
+    this.strategy = strategy
+    return this
+  }
   set (key, value) {
-    localStorage.setItem(key, value)
-  },
+    window[this.strategy].setItem(key, value)
+    return this
+  }
   get (key) {
-    return localStorage.getItem(key)
-  },
+    return window[this.strategy].getItem(key)
+  }
   remove (key) {
-    return localStorage.removeItem(key)
-  },
+    window[this.strategy].removeItem(key)
+    return this
+  }
   clear () {
-    return localStorage.clear()
+    window[this.strategy].clear()
+    return this
   }
 }
-
-const storageMap = {
-  'set-token': token => Cacher.set(USER_TOKEN_KEY, token),
-  'get-token': () => Cacher.get(USER_TOKEN_KEY) || '',
-  'remove-token': () => Cacher.remove(USER_TOKEN_KEY),
-  'get-uid': () => Cacher.get(USER_ID_KEY),
-  'set-uid': uid => Cacher.set(USER_ID_KEY, uid),
-  'remove-uid': () => Cacher.remove(USER_ID_KEY),
-  'set-auth': auth => Cacher.set(AUTHORITY_KEY, auth),
-  'get-auth': () => Cacher.get(AUTHORITY_KEY),
-  'remove-auth': () => Cacher.remove(AUTHORITY_KEY)
-}
+export const cacher = new Cacher()
 
 const Storage = {
-  set (key, value) {
-    storageMap[`set-${key}`].call(this, value)
+  setToken (value) {
+    cacher.setStrategy('localStorage').set(USER_TOKEN_KEY, value)
   },
-  get (key) {
-    return storageMap[`get-${key}`].call(this)
+  getToken () {
+    return cacher.setStrategy('localStorage').get(USER_TOKEN_KEY)
   },
-  remove (key) {
-    storageMap[`remove-${key}`].call()
-  },
-  clearAuth () {
-    this.remove('token')
-    this.remove('uid')
-    this.remove('auth')
+  removeToken () {
+    cacher.setStrategy('localStorage').remove(USER_TOKEN_KEY)
   }
 }
 

@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:36:28
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 19:03:08
+ * @Last Modified time: 2019-09-22 17:14:43
  */
 
 export default {
@@ -10,6 +10,7 @@ export default {
   uid: state => state.user.token,
   avatar: state => state.user.avatar,
   name: state => state.user.name,
+  pwd: state => state.user.pwd,
   introduction: state => state.user.introduction,
   userInfo: state => state.user.userInfo,
   navbarMenus: state => state.menu.navbarMenus,

@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:37:25
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-02-10 15:16:03
+ * @Last Modified time: 2019-09-22 17:14:13
  */
 
 import {
@@ -11,21 +11,24 @@ import {
   SET_INTRODUCTION,
   SET_NAME,
   SET_AVATAR,
-  SET_USER_INFO
+  SET_USER_INFO,
+  SET_PWD
 } from '../mutation-types'
 import UserAPI from '@/api/user'
 import SystemAPI from '@/api/system'
-import Storage from '@/common/cache'
+import Storage, {cacher} from '@/common/cache'
+import md5 from 'md5'
 
 const user = {
   state: {
     user: '',
-    token: Storage.get('token'),
-    uid: Storage.get('uid'),
-    name: '',
+    token: Storage.getToken(),
+    uid: cacher.setStrategy('sessionStorage').get('pk'),
+    name: cacher.setStrategy('sessionStorage').get('name'),
     avatar: '',
     introduction: '',
-    userInfo: null
+    userInfo: null,
+    pwd: cacher.setStrategy('sessionStorage').get('pk')
   },
   mutations: {
     [SET_TOKEN] (state, token) {
@@ -45,20 +48,25 @@ const user = {
     },
     [SET_USER_INFO] (state, userInfo) {
       state.userInfo = userInfo
+    },
+    [SET_PWD] (state, pwd) {
+      state.pwd = pwd
     }
   },
   actions: {
     loginByAccount ({ commit }, userInfo) {
       return new Promise((resolve, reject) => {
-        SystemAPI.login(userInfo.account.trim(), userInfo.password).then(data => {
-          const loginRes = data.data
-          if (data.code === 0) {
-            const token = loginRes.accessToken
-            const uid = loginRes.uid
-            Storage.set('token', token)
-            Storage.set('uid', uid)
+        const password = md5(btoa(userInfo.password) + userInfo.password)
+        SystemAPI.login(userInfo.account.trim(), password).then(data => {
+          if (data) {
+            const token = data.access_token
+            Storage.setToken(token)
+            cacher.setStrategy('sessionStorage').set('pk', password)
+            cacher.setStrategy('sessionStorage').set('name', userInfo.account.trim())
             commit('SET_TOKEN', token)
-            commit('SET_UID', uid)
+            commit('SET_NAME', userInfo.account.trim())
+            commit('SET_USER_INFO', data)
+            commit('SET_PWD', password)
           }
           resolve(data)
         }).catch(error => {
@@ -92,10 +100,12 @@ const user = {
       return new Promise((resolve, reject) => {
         SystemAPI.logout(state.token).then(() => {
           commit('SET_TOKEN', '')
-          commit('SET_UID', '')
           commit('SET_USER_INFO', null)
-          Storage.remove('token')
-          Storage.remove('uid')
+          commit('SET_NAME', '')
+          commit('SET_PWD', '')
+          Storage.removeToken()
+          cacher.setStrategy('sessionStorage').remove('pk')
+          cacher.setStrategy('sessionStorage').remove('name')
           resolve()
         }).catch(error => {
           reject(error)

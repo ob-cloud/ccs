@@ -2,11 +2,11 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-20 16:56:42
+ * @Last Modified time: 2019-09-22 16:40:16
  */
 
 import request from '@/common/fetch'
-
+import qs from 'qs'
 
 const SystemAPI = {
   getAddressList () {
@@ -21,13 +21,19 @@ const SystemAPI = {
   getMedicalList () {
     return request.get('/dict/disease/list')
   },
-  login (account, password) {
-    return request.post({
-      url: 'login',
-      params: {
-        account,
-        password
-      }
+  login (username, password) {
+    // return request.post({
+    //   url: 'login',
+    //   params: {
+    //     account,
+    //     password
+    //   }
+    // })
+    console.log(request)
+    return request.post('/oauth/token', qs.stringify({password, username, grant_type: 'password'}), {
+      Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'cache-control': 'no-cache'
     })
   },
   logout (accessToken) {

@@ -117,8 +117,8 @@ export default {
     }
     return {
       loginForm: {
-        account: 'admin',
-        password: '123456799'
+        account: '15879618946',
+        password: '12345678'
       },
       loginRules: {
         account: [{ required: true, trigger: 'blur', validator: validateAccount }],
@@ -134,7 +134,7 @@ export default {
           this.loading = true
           this.$store.dispatch('loginByAccount', this.loginForm).then(response => {
             this.loading = false
-            if (response.code !== 0) {
+            if (!response) {
               this.$message({
                 message: response.msg || '登录失败',
                 type: 'error'
