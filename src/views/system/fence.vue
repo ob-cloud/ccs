@@ -128,17 +128,17 @@ export default {
         label: '序号',
         prop: 'id',
         align: 'center',
-        width: '60px'
+        width: '50px'
       }, {
         label: '名称',
         prop: 'name',
         align: 'center',
         width: '100px'
       }, {
-        label: '半径',
+        label: '半径/m',
         prop: 'radius',
         align: 'center',
-        width: '60px'
+        width: '70px'
       }, {
         label: '操作',
         align: 'center',
