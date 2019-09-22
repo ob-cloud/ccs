@@ -62,8 +62,8 @@ export default {
         radius: 400
       },
       center: {
-        lng: 113.4571463094,
-        lat: 23.1696747060
+        lng: 113.8385127760,
+        lat: 23.3861140903
       },
       activeAnchor: 0,
       activeFence: {}
@@ -101,7 +101,10 @@ export default {
       FenceAPI.getFenceList(this.search).then(resp => {
         if (resp.code === 0) {
           this.tableData = resp.data.records
-          this.activeAnchor = 1
+          // this.activeAnchor = 1
+          this.activeAnchor = this.tableData[0].id
+          // this.center.lng = +this.tableData[0].lng
+          // this.center.lat = +this.tableData[0].lat
         } else {
           this.$message({
             message: resp.message || '列表获取失败'
