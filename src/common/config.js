@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:23
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 16:52:13
+ * @Last Modified time: 2019-09-23 18:57:57
  */
 
 const config = {
@@ -13,6 +13,9 @@ const config = {
   },
   prod: {
     baseApi: ''
+  },
+  websocket: {
+    url: 'http://192.168.200.108:8901/queueServer'
   }
 }
 export default config

@@ -58,13 +58,16 @@ export default {
   mounted () {
     this.fixLayout()
     this.getElderList()
+    this.initWebSocket()
   },
   watch: {
     records: {
       deep: true,
       handler (val) {
         const target = this.elderList.find(item => item.serialId === val.serialId)
-        target.deviceStatus = val.deviceStatus
+        if (target) {
+          target.deviceStatus = val.deviceStatus
+        }
       }
     }
   },
@@ -109,13 +112,13 @@ export default {
     connection () {
       const that = this
       try {
-        const socket = new SockJS(`${Config.prod.baseApi || ''}/queueServer`)
+        const socket = new SockJS(Config.websocket.url)
         this.stompClient = Stomp.over(socket)
         this.stompClient.connect(
           {},
           frame => {
             this.stompClient.subscribe(
-              `/user/${this.token}/remindByAli`,
+              `/user/pushmsg/remindByAli`,
               response => {
                 console.log('----- ', response)
                 try {
