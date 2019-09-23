@@ -25,6 +25,9 @@
 
 <script>
 import HouseAPI from '@/api/house'
+import Config from '@/common/config'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 export default {
   data () {
     return {
@@ -33,6 +36,7 @@ export default {
         children: 'children',
         label: 'label'
       },
+      records: {},
       boxContainerHeight: 700
     }
   },
@@ -55,12 +59,21 @@ export default {
     this.fixLayout()
     this.getElderList()
   },
+  watch: {
+    records: {
+      deep: true,
+      handler (val) {
+        const target = this.elderList.find(item => item.serialId === val.serialId)
+        target.deviceStatus = val.deviceStatus
+      }
+    }
+  },
   methods: {
     fixLayout () {
       this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
     },
     getElderList () {
-      HouseAPI.getHouseElderList().then(res => {
+      HouseAPI.getHouseElderList({houseId: 18}).then(res => {
         if (res.code === 0) {
           this.elderList = res.data.records
         }
@@ -81,8 +94,58 @@ export default {
         2: '#d0d0d0'
       }
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
-    }
+    },
+    initWebSocket () {
+      const that = this
+      this.connection()
+      this.timer = setInterval(() => {
+        try {
+          that.stompClient.send('test')
+        } catch (err) {
+          that.connection()
+        }
+      }, 3600000)
+    },
+    connection () {
+      const that = this
+      try {
+        const socket = new SockJS(`${Config.prod.baseApi || ''}/queueServer`)
+        this.stompClient = Stomp.over(socket)
+        this.stompClient.connect(
+          {},
+          frame => {
+            this.stompClient.subscribe(
+              `/user/${this.token}/remindByAli`,
+              response => {
+                console.log('----- ', response)
+                try {
+                  that.records = JSON.parse(response.body)
+                  console.log(that.records)
+                } catch (error) {
+                  console.log('推送解析失败', error)
+                }
+              },
+              { ack: 'client-individual' }
+            )
+          },
+          err => {
+            console.log(err)
+          }
+        )
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    disconnect () {
+      if (this.stompClient) {
+        this.stompClient.disconnect()
+      }
+    },
   },
+  beforeDestroy () {
+    this.disconnect()
+    clearInterval(this.timer)
+  }
 }
 </script>
 

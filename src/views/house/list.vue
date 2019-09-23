@@ -48,8 +48,8 @@
           <el-input class="caption-item w8" placeholder="经度" v-model="houseModel.lng"></el-input>
           <el-input class="caption-item w8" placeholder="纬度" v-model="houseModel.lat"></el-input>
         </el-form-item>
-        <el-form-item label="联系人"  prop="contact">
-          <el-input class="caption-item w8" placeholder="联系人" v-model="houseModel.contact"></el-input>
+        <el-form-item label="联系人"  prop="contacter">
+          <el-input class="caption-item w8" placeholder="联系人" v-model="houseModel.contacter"></el-input>
         </el-form-item>
         <el-form-item label="联系电话"  prop="phone">
           <el-input class="caption-item w8" placeholder="联系电话" v-model="houseModel.phone"></el-input>
@@ -90,15 +90,15 @@ export default {
         addressDetail: '',
         lng: '',
         lat: '',
-        contact: '',
+        contacter: '',
         phone: ''
       },
       houseModelRules: {
         name: [{ required: true, trigger: 'blur', message: '名称不能为空'}],
         type: [{ required: true, trigger: 'blur', message: '机构性质不能为空'}],
-        address: [{ required: true, trigger: 'blur', message: '地址不能为空'}],
+        // address: [{ required: true, trigger: 'blur', message: '地址不能为空'}],
         lng: [{ required: true, trigger: 'blur', message: '经纬度不能为空'}],
-        contact: [{ required: true, trigger: 'blur', message: '联系人不能为空'}],
+        contacter: [{ required: true, trigger: 'blur', message: '联系人不能为空'}],
         phone: [{ required: true, trigger: 'blur', message: '联系电话不能为空'}]
       },
       addressOptions: [],
@@ -113,7 +113,7 @@ export default {
   created () {
     this.columns = this.getColumns()
     this.getHouseList()
-    this.getAddressList()
+    // this.getAddressList()
   },
   mounted () {
     Helper.windowOnResize(this, this.fixLayout)
@@ -152,7 +152,7 @@ export default {
         align: 'center'
       }, {
         label: '联系人',
-        prop: 'contact',
+        prop: 'contacter',
         align: 'center'
       }, {
         label: '联系电话',
@@ -166,6 +166,7 @@ export default {
     },
     getToolboxRender (h, row) {
       return [
+        <el-button size="tiny" icon="el-icon-tickets" title="查看房间" onClick={() => this.handleCheckRoom(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
       ]
@@ -214,11 +215,17 @@ export default {
       this.createDialogVisible = true
       this.dialogAction = '添加养老院'
       this.houseModel = {}
+      !this.addressOptions.length && this.getAddressList()
     },
     createHouse () {
       this.$refs.houseForm.validate(valid => {
         if (valid) {
-          HouseAPI.createHouse(this.houseModel).then(res => {
+          const methods = {
+            '添加养老院': 'createHouse',
+            '编辑养老院': 'updateHouse'
+          }[this.dialogAction]
+          this.houseModel.address = this.houseModel.addressDetail
+          HouseAPI[methods]({...this.houseModel, ...{lng: +this.houseModel.lng, lat: +this.houseModel.lat}}).then(res => {
             if (res.code === 0) {
               this.$message({
                 type: 'success',
@@ -245,6 +252,7 @@ export default {
       this.dialogAction = '编辑养老院'
       this.createDialogVisible = true
       this.houseModel = {...row}
+      !this.addressOptions.length && this.getAddressList()
     },
     handleDelete (row) {
       this.$confirm('确认删除养老院？', '确认提示', {
@@ -278,7 +286,10 @@ export default {
           message: '服务异常' + err
         })
       })
-    }
+    },
+    handleCheckRoom (house) {
+      this.$router.push({path: '/room/index.html', query: {id: house.id, path: this.$route.path, name: house.name}})
+    },
   }
 }
 </script>

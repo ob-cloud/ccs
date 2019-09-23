@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-23 10:34:17
+ * @Last Modified time: 2019-09-23 17:42:04
  */
 
 import request from '@/common/fetch'
@@ -29,13 +29,7 @@ const SystemAPI = {
     //     password
     //   }
     // })
-    return request.post('/oauth/token', {password, username, grant_type: 'password'}, {
-      headers: {
-        Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
-        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-        'cache-control': 'no-cache'
-      }
-    })
+    return request.postForm('/oauth/token', {password, username, grant_type: 'password'})
   },
   logout (accessToken) {
     // return request.post({

@@ -25,7 +25,7 @@
 
 <script>
 import BaseTable from '@/assets/package/table-base'
-import DeviceAPI from '@/api/device'
+// import DeviceAPI from '@/api/device'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
 export default {
@@ -66,7 +66,10 @@ export default {
       }, {
         label: '状态',
         prop: 'status',
-        align: 'center'
+        align: 'center',
+        formatter (val) {
+          return val === 0 ? '离线' : '在线'
+        }
       }, {
         label: '创建时间',
         prop: 'createTime',
@@ -79,24 +82,111 @@ export default {
     },
     getDeviceList () {
       this.tableLoading = true
-      DeviceAPI.getDeviceList(this.search).then(resp => {
-        if (resp.code === 0) {
-          this.tableData = resp.data.records
-          this.total = resp.data.total
-        } else {
-          this.$message({
-            message: resp.message || '设备获取失败'
-          })
+      const device = {
+        'data': {
+          'records': [
+            {
+              'id': '1',
+              'status': 0,
+              'createTime': '1983-03-24 02:42:08',
+              'updateTime': '1997-04-04 20:48:20',
+              'name': '血压仪'
+            },
+            {
+              'id': '2',
+              'status': 1,
+              'createTime': '2015-11-09 13:17:25',
+              'updateTime': '1972-07-03 23:27:29',
+              'name': '小夜灯'
+            },
+            {
+              'id': '3',
+              'status': 0,
+              'createTime': '1987-07-29 13:55:50',
+              'updateTime': '1992-08-03 16:53:07',
+              'name': '烟感'
+            },
+            {
+              'id': '4',
+              'status': 2,
+              'createTime': '2016-06-25 07:48:36',
+              'updateTime': '1970-12-24 17:00:58',
+              'name': '雷达'
+            },
+            {
+              'id': '5',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '燃气探测'
+            },
+            {
+              'id': '6',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '洗澡灯'
+            },
+            {
+              'id': '7',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '雷达探测'
+            },
+            {
+              'id': '8',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '无线呼叫报警'
+            },
+            {
+              'id': '9',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '睡眠监控仪'
+            },
+            {
+              'id': '10',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '尿床检测垫'
+            },
+            {
+              'id': '11',
+              'status': 1,
+              'createTime': '1991-05-10 01:47:44',
+              'updateTime': '1990-12-05 12:19:57',
+              'name': '摄像头'
+            }
+          ],
+          'total': 11
         }
-        this.tableLoading = false
-      }).catch(err => {
-        this.$message({
-          title: '失败',
-          message: err.message || '服务出错',
-          type: 'error'
-        })
-        this.tableLoading = false
-      })
+      }
+      this.tableData = device.data.records
+      this.total = device.data.total
+      this.tableLoading = false
+      // DeviceAPI.getDeviceList(this.search).then(resp => {
+      //   if (resp.code === 0) {
+      //     this.tableData = resp.data.records
+      //     this.total = resp.data.total
+      //   } else {
+      //     this.$message({
+      //       message: resp.message || '设备获取失败'
+      //     })
+      //   }
+      //   this.tableLoading = false
+      // }).catch(err => {
+      //   this.$message({
+      //     title: '失败',
+      //     message: err.message || '服务出错',
+      //     type: 'error'
+      //   })
+      //   this.tableLoading = false
+      // })
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo

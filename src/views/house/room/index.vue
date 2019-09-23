@@ -1,5 +1,9 @@
 <template>
   <div class="content">
+    <el-breadcrumb separator-class="el-icon-arrow-right">
+      <el-breadcrumb-item :to="{ path: breadcrumb.path }">{{breadcrumb.name}}</el-breadcrumb-item>
+      <el-breadcrumb-item>房间管理</el-breadcrumb-item>
+    </el-breadcrumb>
     <base-table
       :height="tableHeight"
       :tableData="tableData"
@@ -20,6 +24,7 @@
           <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
         </template>
         <template slot="actionBar">
+          <el-button type="default" @click="handleBack">返回上一级</el-button>
           <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加房间</el-button>
         </template>
       </slot>
@@ -31,8 +36,7 @@
         </el-form-item>
         <el-form-item label="养老院" prop="houseId">
           <el-select clearable class="caption-item w8" placeholder="选择养老院" v-model="roomModel.houseId">
-            <el-option label='养老院1' :value='0'></el-option>
-            <el-option label='养老院2' :value='1'></el-option>
+            <el-option :label='item.name' :value='item.id' v-for="item in houseList" :key="item.id"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="楼栋"  prop="building">
@@ -96,6 +100,7 @@
 import BaseTable from '@/assets/package/table-base'
 import RoomAPI from '@/api/room'
 import DeviceAPI from '@/api/device'
+import HouseAPI from '@/api/house'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
 export default {
@@ -118,6 +123,7 @@ export default {
       tableData: [],
       columns: [],
       search: {
+        houseId: '',
         room: '',
         roomType: '',
         pageNo: PAGINATION_PAGENO,
@@ -143,6 +149,7 @@ export default {
         roomType: [{ required: true, trigger: 'blur', message: '请选择房型'}],
         beds: [{ required: true, trigger: 'blur', validator: validateBeds}]
       },
+      houseList: [],
       dialogAction: '添加房间',
       createDialogVisible: false,
       bindingDialogVisible: false,
@@ -156,7 +163,8 @@ export default {
         deviceId: [{ required: true, trigger: 'blur', message: '请选择设备'}]
       },
       bingdingBedList: [],
-      deviceList: []
+      deviceList: [],
+      breadcrumb: {}
     }
   },
   computed: {
@@ -165,7 +173,6 @@ export default {
   components: { BaseTable },
   created () {
     this.columns = this.getColumns()
-    this.getRoomList()
   },
   watch: {
     'roomModel.bed': {
@@ -176,6 +183,9 @@ export default {
     }
   },
   mounted () {
+    this.search.houseId = this.$route.query.id
+    this.breadcrumb = {path: this.$route.query.path, name: this.$route.query.name}
+    this.getRoomList()
     Helper.windowOnResize(this, this.fixLayout)
   },
   methods: {
@@ -211,12 +221,12 @@ export default {
     },
     getToolboxRender (h, row) {
       return [
-        <el-button size="tiny" icon="el-icon-connection" onClick={() => this.handleConnect(row)}></el-button>,
+        <el-button size="tiny" icon="el-icon-connection" title="绑定设备" onClick={() => this.handleConnect(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
         <el-button size="tiny" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
       ]
     },
-    getRoomList () {
+    getRoomList (id) {
       this.tableLoading = true
       RoomAPI.getRoomList(this.search).then(resp => {
         if (resp.code === 0) {
@@ -244,6 +254,13 @@ export default {
         }
       })
     },
+    getHouseList () {
+      HouseAPI.getHouseList().then(res => {
+        if (res.code === 0) {
+          this.houseList = res.data.records
+        }
+      })
+    },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
       this.getRoomList()
@@ -256,6 +273,7 @@ export default {
       this.getRoomList()
     },
     handleCreate () {
+      !this.houseList.length && this.getHouseList()
       this.createDialogVisible = true
       this.dialogAction = '添加房间'
       this.roomModel = {
@@ -268,7 +286,11 @@ export default {
     createHouse () {
       this.$refs.roomForm.validate(valid => {
         if (valid) {
-          RoomAPI.createRoom(this.roomModel).then(res => {
+          const methods = {
+            '添加房间': 'createRoom',
+            '编辑房间': 'updateRoom'
+          }[this.dialogAction]
+          RoomAPI[methods](this.roomModel).then(res => {
             if (res.code === 0) {
               this.$message({
                 type: 'success',
@@ -325,6 +347,7 @@ export default {
       })
     },
     handleEdit (row) {
+      !this.houseList.length && this.getHouseList()
       this.dialogAction = '编辑房间'
       this.createDialogVisible = true
       this.roomModel = {...row}
@@ -336,13 +359,13 @@ export default {
         type: 'warning',
         closeOnClickModal: false
       }).then(() => {
-        this.doDelete(row.id)
+        this.doDelete(row.id, row.houseId)
       }).catch(() => {
         console.log('取消删除')
       })
     },
-    doDelete (id) {
-      RoomAPI.deleteRoom(id).then(res => {
+    doDelete (id, houseId) {
+      RoomAPI.deleteRoom(id, 18).then(res => {
         if (res.code === 0) {
           this.$message({
             type: 'success',
@@ -370,6 +393,9 @@ export default {
     },
     removeBedHandler (index) {
       this.roomModel.bed.splice(index, 1)
+    },
+    handleBack () {
+      this.$router.push({path: this.breadcrumb.path})
     }
   }
 }

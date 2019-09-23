@@ -12,7 +12,7 @@ const config = {
     baseApi: 'http://localhost:8080'
   },
   prod: {
-    baseApi: 'https://easy-mock.com/mock/5c5ae3f128e4ba5d7fa300eb/mip/'
+    baseApi: ''
   }
 }
 export default config

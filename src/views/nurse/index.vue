@@ -25,7 +25,7 @@
 
 <script>
 import BaseTable from '@/assets/package/table-base'
-import NurseAPI from '@/api/nurse'
+// import NurseAPI from '@/api/nurse'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
 export default {
@@ -111,25 +111,99 @@ export default {
       ]
     },
     getNurseList () {
-      this.tableLoading = true
-      NurseAPI.getNurseList(this.search).then(resp => {
-        if (resp.code === 0) {
-          this.tableData = resp.data.records
-          this.total = resp.data.total
-        } else {
-          this.$message({
-            message: resp.message || '护工列表获取失败'
-          })
-        }
-        this.tableLoading = false
-      }).catch(err => {
-        this.$message({
-          title: '失败',
-          message: err.message || '服务出错',
-          type: 'error'
-        })
-        this.tableLoading = false
-      })
+      const nurse = {
+        'records': [
+          {
+            'id': '1',
+            'name': '石洁珊',
+            'gender': 1,
+            'hiredate': '2019-05-05',
+            'leavedate': '',
+            'status': 1,
+            'rank': '护工',
+            'task': '',
+            'elder': '',
+            'houseId': '',
+            'houseName': ''
+          },
+          {
+            'id': '2',
+            'name': '童显会',
+            'gender': 1,
+            'hiredate': '2019-06-05',
+            'leavedate': '',
+            'status': 1,
+            'rank': '护工',
+            'task': '',
+            'elder': '',
+            'houseId': '',
+            'houseName': ''
+          },
+          {
+            'id': '3',
+            'name': '陈体添',
+            'gender': 1,
+            'hiredate': '2019-03-05',
+            'leavedate': '',
+            'status': 1,
+            'rank': '护工',
+            'task': '',
+            'elder': '',
+            'houseId': '',
+            'houseName': ''
+          },
+          {
+            'id': '4',
+            'name': '潘桂平',
+            'gender': 1,
+            'hiredate': '2019-05-05',
+            'leavedate': '',
+            'status': 1,
+            'rank': '护工',
+            'task': '',
+            'elder': '',
+            'houseId': '',
+            'houseName': ''
+          },
+          {
+            'id': '5',
+            'name': '温玉姨',
+            'gender': 1,
+            'hiredate': '2019-06-05',
+            'leavedate': '',
+            'status': 1,
+            'rank': '护工',
+            'task': '',
+            'elder': '',
+            'houseId': '',
+            'houseName': ''
+          }
+        ],
+        'total': 1
+      }
+      this.tableData = nurse.records
+      this.total = nurse.total
+      this.tableLoading = false
+
+      // this.tableLoading = true
+      // NurseAPI.getNurseList(this.search).then(resp => {
+      //   if (resp.code === 0) {
+      //     this.tableData = resp.data.records
+      //     this.total = resp.data.total
+      //   } else {
+      //     this.$message({
+      //       message: resp.message || '护工列表获取失败'
+      //     })
+      //   }
+      //   this.tableLoading = false
+      // }).catch(err => {
+      //   this.$message({
+      //     title: '失败',
+      //     message: err.message || '服务出错',
+      //     type: 'error'
+      //   })
+      //   this.tableLoading = false
+      // })
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo

@@ -38,6 +38,24 @@ service.interceptors.response.use(({data}) => {
   Promise.reject(error)
 })
 
+const _defaults = (method, url, params, headers, type) => {
+  const config = {
+    method,
+    url,
+    params: ['GET', 'DELETE'].includes(method.toUpperCase()) ? params : {},
+    data: ['POST', 'PUT'].includes(method.toUpperCase()) ? params : {}
+  }
+  if (headers) {
+    config.headers = headers
+  }
+  config.transformRequest = type === 'json' ? [function (data) {
+    return JSON.stringify(data)
+  }] : [function (data) {
+    return QS.stringify(data)
+  }]
+  return config
+}
+
 service.getRequestUrl = url => requestBaseUrl + url
 
 const request = {
@@ -52,43 +70,50 @@ const request = {
     })
   },
   // url, data, json = false, serials = true
-  post (url, params, setting = {}) {
-    const config = {
-      method: 'post',
-      url: url,
-      data: params
+  // post (url, params, setting = {}) {
+  //   const config = {
+  //     method: 'post',
+  //     url: url,
+  //     data: params
+  //   }
+  //   if (setting.json) {
+  //     config.headers = {
+  //       'Content-Type': 'application/json; charset=utf-8'
+  //     }
+  //     config.transformRequest = [function (data) {
+  //       // 对 data 进行任意转换处理
+  //       // 后台使用@RequestParam接收参数时，post请求需要接收 username=xxx&password=xxx的格式
+  //       return JSON.stringify(data)
+  //     }]
+  //   } else { // 表单
+  //     config.headers = setting.headers && {...setting.headers}
+  //     config.transformRequest = [function (data) {
+  //       // 对 data 进行任意转换处理
+  //       // 后台使用@RequestParam接收参数时，post请求需要接收 username=xxx&password=xxx的格式
+  //       return QS.stringify(data)
+  //     }]
+  //   }
+  //   return service(config)
+  // },
+  post (url, params, headers = {}) {
+    const defaultHeaders = {
+      'Content-Type': 'application/json; charset=utf-8'
     }
-    if (setting.json) {
-      config.headers = {
-        'Content-Type': 'application/json; charset=utf-8'
-      }
-      config.transformRequest = [function (data) {
-        // 对 data 进行任意转换处理
-        // 后台使用@RequestParam接收参数时，post请求需要接收 username=xxx&password=xxx的格式
-        return JSON.stringify(data)
-      }]
-    } else {
-      config.headers = setting.headers && {...setting.headers}
-      config.transformRequest = [function (data) {
-        // 对 data 进行任意转换处理
-        // 后台使用@RequestParam接收参数时，post请求需要接收 username=xxx&password=xxx的格式
-        return QS.stringify(data)
-      }]
+    return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, 'json'))
+  },
+  postJson (url, params, headers = {}) {
+    const defaultHeaders = {
+      'Content-Type': 'application/json; charset=utf-8'
     }
-    return service(config)
-    // return service({
-    //   method: 'post',
-    //   url,
-    //   data: data,
-    //   // `transformRequest` 允许在向服务器发送前，修改请求数据
-    //   // 只能用在 'PUT', 'POST' 和 'PATCH' 这几个请求方法
-    //   // 后面数组中的函数必须返回一个字符串，或 ArrayBuffer，或 Stream
-    //   transformRequest: [function (data) {
-    //     // 对 data 进行任意转换处理
-    //     // 后台使用@RequestParam接收参数时，post请求需要接收 username=xxx&password=xxx的格式
-    //     return serials ? (json ? JSON.stringify(data) : QS.stringify(data)) : data
-    //   }]
-    // })
+    return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, 'json'))
+  },
+  postForm (url, params, headers = {}) {
+    const defaultHeaders = {
+      Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
+      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'cache-control': 'no-cache'
+    }
+    return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, ''))
   }
 }
 export default request

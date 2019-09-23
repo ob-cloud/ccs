@@ -11,7 +11,7 @@ export const sidebarMenusHouse = [
     id: 1,
     name: '养老院管理',
     path: '/house/list.html'
-  },
+  }
   // {
   //   id: 1,
   //   name: '养老院管理',
@@ -31,15 +31,16 @@ export const sidebarMenusHouse = [
   //     path: '/community/list.html'
   //   }]
   // },
-  {
-    id: 31,
-    name: '房间管理',
-    path: '/room/index.html'
-  }, {
-    id: 3,
-    name: '房型管理',
-    path: '/roomtype/index.html'
-  }
+  // {
+  //   id: 31,
+  //   name: '房间管理',
+  //   path: '/room/index.html'
+  // },
+  // {
+  //   id: 3,
+  //   name: '房型管理',
+  //   path: '/roomtype/index.html'
+  // }
 ]
 
 export const NurseSidebarMenu = [
@@ -47,16 +48,17 @@ export const NurseSidebarMenu = [
     id: 1,
     name: '护工列表',
     path: '/nurse/index.html'
-  },
-  {
-    id: 2,
-    name: '排班计划',
-    path: '/nurse/schedule/index.html'
-  }, {
-    id: 3,
-    name: '日常护理',
-    path: '/nurse/task/index.html'
   }
+  // ,
+  // {
+  //   id: 2,
+  //   name: '排班计划',
+  //   path: '/nurse/schedule/index.html'
+  // }, {
+  //   id: 3,
+  //   name: '日常护理',
+  //   path: '/nurse/task/index.html'
+  // }
 ]
 
 export const systemtMenus = [
@@ -89,9 +91,10 @@ export const systemtMenus = [
     id: 5,
     name: '消息管理',
     path: '/system/message.html'
-  }, {
-    id: 6,
-    name: '系统配置',
-    path: '/system/setting.html'
   }
+  // , {
+  //   id: 6,
+  //   name: '系统配置',
+  //   path: '/system/setting.html'
+  // }
 ]

@@ -88,7 +88,10 @@ export default {
       roomList: [],
       bedList: [],
       checkInModel: {
+        type: 0,
+        elderId: '',
         elder: '',
+        houseId: 18,
         houseName: '',
         roomId: '',
         bedNo: ''
@@ -253,6 +256,8 @@ export default {
     handleCheckIn (row) {
       this.checkinDialogVisible = true
       !this.roomList.length && this.getRoomList()
+      this.checkInModel.elder = row.name
+      this.checkInModel.elderId = row.id
     },
     doCheckIn () {
       this.$refs.checkInForm.validate(valid => {

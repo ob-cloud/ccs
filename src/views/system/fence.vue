@@ -48,7 +48,7 @@ import BmLabel from 'vue-baidu-map/components/overlays/Label.vue'
 import BmCircle from 'vue-baidu-map/components/overlays/Circle.vue'
 
 import BaseTable from '@/assets/package/table-base'
-import FenceAPI from '@/api/fence'
+// import FenceAPI from '@/api/fence'
 export default {
   data () {
     return {
@@ -100,28 +100,46 @@ export default {
     },
     getFenceList () {
       this.tableLoading = true
-      FenceAPI.getFenceList(this.search).then(resp => {
-        if (resp.code === 0) {
-          this.tableData = resp.data.records
-          this.activeAnchor = this.tableData[0].id
-          // this.activeFence = this.tableData[0]
-          // this.activeAnchor = this.tableData[0].id
-          // this.center.lng = +this.tableData[0].lng
-          // this.center.lat = +this.tableData[0].lat
-        } else {
-          this.$message({
-            message: resp.message || '列表获取失败'
-          })
+      const fence = {
+        'data': {
+          'records': [
+            {
+              'id': 1,
+              'name': '增城小楼养老院',
+              'lng': '113.8385127760',
+              'lat': '23.3861140903',
+              'type': 1,
+              'radius': 200
+            }
+          ],
+          'total': 1
         }
-        this.tableLoading = false
-      }).catch(err => {
-        this.$message({
-          title: '失败',
-          message: err.message || '服务出错',
-          type: 'error'
-        })
-        this.tableLoading = false
-      })
+      }
+      this.tableData = fence.data.records
+      this.activeAnchor = this.tableData[0].id
+      this.tableLoading = false
+      // FenceAPI.getFenceList(this.search).then(resp => {
+      //   if (resp.code === 0) {
+      //     this.tableData = resp.data.records
+      //     this.activeAnchor = this.tableData[0].id
+      //     // this.activeFence = this.tableData[0]
+      //     // this.activeAnchor = this.tableData[0].id
+      //     // this.center.lng = +this.tableData[0].lng
+      //     // this.center.lat = +this.tableData[0].lat
+      //   } else {
+      //     this.$message({
+      //       message: resp.message || '列表获取失败'
+      //     })
+      //   }
+      //   this.tableLoading = false
+      // }).catch(err => {
+      //   this.$message({
+      //     title: '失败',
+      //     message: err.message || '服务出错',
+      //     type: 'error'
+      //   })
+      //   this.tableLoading = false
+      // })
     },
     getColumns () {
       return [{

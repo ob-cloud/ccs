@@ -47,7 +47,7 @@
 
 <script>
 import BaseTable from '@/assets/package/table-base'
-import MessageAPI from '@/api/message'
+// import MessageAPI from '@/api/message'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 export default {
   data () {
@@ -111,29 +111,54 @@ export default {
     },
     getMessageList () {
       this.tableLoading = true
-      const methods = {
-        'unhandle': 'getUnhandleMessage',
-        'days': 'getDaysMessage',
-        'offline': 'getOfflineMessage'
-      }
-      MessageAPI[methods[this.activeName]](this.search).then(resp => {
-        if (resp.code === 0) {
-          this.tableData = resp.data.records
-          this.total = resp.data.total
-        } else {
-          this.$message({
-            message: resp.message || '设备获取失败'
-          })
+      const message = {
+        'data': {
+          'records': [
+            {
+              'id': '710000199501225215',
+              'deviceName': '燃气探测',
+              'nurse': '乔强',
+              'elder': '梁军',
+              'imie': '710000199501225215',
+              'nurseId': '710000199501225215',
+              'type': 2,
+              alarmType: '离线报警',
+              noticeTime: '2009-09-21 08:17:59',
+              'locationTime': '2009-09-21 08:17:59',
+              'alarmTime': '1991-12-18 15:31:25',
+              'model': 'a5c8eCd4-e31d-68FF-fDaD-C6Ddd222Fec5',
+              'status': 0
+            }
+          ],
+          'total': 1
         }
-        this.tableLoading = false
-      }).catch(err => {
-        this.$message({
-          title: '失败',
-          message: err.message || '服务出错',
-          type: 'error'
-        })
-        this.tableLoading = false
-      })
+      }
+      this.tableData = message.data.records
+      this.total = message.data.total
+      this.tableLoading = false
+      // const methods = {
+      //   'unhandle': 'getUnhandleMessage',
+      //   'days': 'getDaysMessage',
+      //   'offline': 'getOfflineMessage'
+      // }
+      // MessageAPI[methods[this.activeName]](this.search).then(resp => {
+      //   if (resp.code === 0) {
+      //     this.tableData = resp.data.records
+      //     this.total = resp.data.total
+      //   } else {
+      //     this.$message({
+      //       message: resp.message || '设备获取失败'
+      //     })
+      //   }
+      //   this.tableLoading = false
+      // }).catch(err => {
+      //   this.$message({
+      //     title: '失败',
+      //     message: err.message || '服务出错',
+      //     type: 'error'
+      //   })
+      //   this.tableLoading = false
+      // })
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
