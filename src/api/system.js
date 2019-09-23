@@ -2,11 +2,11 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 16:40:16
+ * @Last Modified time: 2019-09-23 10:34:17
  */
 
 import request from '@/common/fetch'
-import qs from 'qs'
+// import qs from 'qs'
 
 const SystemAPI = {
   getAddressList () {
@@ -29,18 +29,20 @@ const SystemAPI = {
     //     password
     //   }
     // })
-    console.log(request)
-    return request.post('/oauth/token', qs.stringify({password, username, grant_type: 'password'}), {
-      Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
-      'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
-      'cache-control': 'no-cache'
+    return request.post('/oauth/token', {password, username, grant_type: 'password'}, {
+      headers: {
+        Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'cache-control': 'no-cache'
+      }
     })
   },
   logout (accessToken) {
-    return request.post({
-      url: 'logout',
-      params: {accessToken}
-    })
+    // return request.post({
+    //   url: 'logout',
+    //   params: {accessToken}
+    // })
+    return request.post('ccs/logout')
   },
   reNewAcessToken (oldAccessToken) {
     return request.post({

@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:37:25
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 17:14:13
+ * @Last Modified time: 2019-09-23 10:35:53
  */
 
 import {
@@ -14,7 +14,7 @@ import {
   SET_USER_INFO,
   SET_PWD
 } from '../mutation-types'
-import UserAPI from '@/api/user'
+// import UserAPI from '@/api/user'
 import SystemAPI from '@/api/system'
 import Storage, {cacher} from '@/common/cache'
 import md5 from 'md5'
@@ -78,20 +78,21 @@ const user = {
     // 获取用户信息
     getUserInfo ({ commit, state }) {
       return new Promise((resolve, reject) => {
-        UserAPI.getUserInfo(state.uid).then(data => {
-          const userData = data.data
-          if (data.code === 0) {
-            commit('SET_USER_INFO', userData)
-            commit('SET_NAME', userData.userName || userData.nickname)
-            commit('SET_AVATAR', userData.portrait)
-            commit('SET_INTRODUCTION', userData.introduction)
-          } else {
-            console.log(data)
-          }
-          resolve(userData)
-        }).catch(error => {
-          reject(error)
-        })
+        // UserAPI.getUserInfo(state.uid).then(data => {
+        //   const userData = data.data
+        //   if (data.code === 0) {
+        //     commit('SET_USER_INFO', userData)
+        //     commit('SET_NAME', userData.userName || userData.nickname)
+        //     commit('SET_AVATAR', userData.portrait)
+        //     commit('SET_INTRODUCTION', userData.introduction)
+        //   } else {
+        //     console.log(data)
+        //   }
+        //   resolve(userData)
+        // }).catch(error => {
+        //   reject(error)
+        // })
+        resolve()
       })
     },
 
