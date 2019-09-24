@@ -38,13 +38,14 @@ service.interceptors.response.use(({data}) => {
   Promise.reject(error)
 })
 
-const _defaults = (method, url, params, headers, type) => {
-  const config = {
+const _defaults = (method, url, params, headers, type, configOption = {}) => {
+  let config = {
     method,
     url,
     params: ['GET', 'DELETE'].includes(method.toUpperCase()) ? params : {},
     data: ['POST', 'PUT'].includes(method.toUpperCase()) ? params : {}
   }
+  config = {...config, ...configOption}
   if (headers) {
     config.headers = headers
   }
@@ -107,13 +108,13 @@ const request = {
     }
     return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, 'json'))
   },
-  postForm (url, params, headers = {}) {
+  postForm (url, params, headers = {}, configOption = {}) {
     const defaultHeaders = {
       Authorization: 'Basic d2ViQXBwOndlYkFwcA==',
       'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
       'cache-control': 'no-cache'
     }
-    return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, ''))
+    return service(_defaults('post', url, params, {...defaultHeaders, ...headers}, '', configOption))
   }
 }
 export default request

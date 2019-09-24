@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:23
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-24 11:17:53
+ * @Last Modified time: 2019-09-24 18:03:17
  */
 
 const config = {
@@ -12,10 +12,13 @@ const config = {
     baseApi: 'http://localhost:8080/nursinghome'
   },
   prod: {
-    baseApi: 'https://aliiot.on-bright.com/nursinghome'
+    baseApi: 'https://aliiot.on-bright.com'
   },
   websocket: {
     url: 'https://aliiot.on-bright.com/queueServer'
+  },
+  oauth: {
+    url: 'https://aliiot.on-bright.com'
   }
 }
 export default config

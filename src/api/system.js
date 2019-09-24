@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-23 17:42:04
+ * @Last Modified time: 2019-09-24 18:03:21
  */
 
 import request from '@/common/fetch'
@@ -36,7 +36,7 @@ const SystemAPI = {
     //   url: 'logout',
     //   params: {accessToken}
     // })
-    return request.post('ccs/logout')
+    return request.post('nursinghome/ccs/logout')
   },
   reNewAcessToken (oldAccessToken) {
     return request.post({
