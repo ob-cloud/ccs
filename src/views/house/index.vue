@@ -5,8 +5,8 @@
         <div class="box">
           <div class="box-content">
             <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx">
-              <div slot="header" class="clearfix title" :style="{background: parseStatusBackground(item.status, item.deviceStatus)}">
-                <span>{{item.status | statusFilter(item.deviceStatus)}}</span>
+              <div slot="header" class="clearfix title">
+                <span>{{item.deviceStatus}}</span>
               </div>
               <div class="text item">
                 {{item.roomNo}} {{item.bedNo}} {{item.elderName}}
@@ -19,6 +19,19 @@
           </div>
         </div>
       </div>
+      <div class="box-aside">
+        <el-card class="data-card info" style="overflow: auto" :style="{height: `${boxContainerHeight}px`}">
+          <div slot="header" class="">
+            <span>消息</span>
+          </div>
+          <div class="list">
+           <div class="item" v-for="(item, index) in infoList" :key="index">
+             <p class="desc">{{item.message}}</p>
+             <span class="time">{{item.time}}</span>
+           </div>
+          </div>
+        </el-card>
+      </div>
     </section>
   </section>
 </template>
@@ -28,6 +41,7 @@ import HouseAPI from '@/api/house'
 import Config from '@/common/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
+import Helper from '@/common/helper'
 export default {
   data () {
     return {
@@ -37,6 +51,7 @@ export default {
         label: 'label'
       },
       records: {},
+      infoList: [],
       boxContainerHeight: 700
     }
   },
@@ -59,6 +74,7 @@ export default {
     this.fixLayout()
     this.getElderList()
     this.initWebSocket()
+    Helper.windowOnResize(this, this.fixLayout)
   },
   watch: {
     records: {
@@ -72,8 +88,11 @@ export default {
     }
   },
   methods: {
+    // fixLayout () {
+    //   this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
+    // },
     fixLayout () {
-      this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
+      this.boxContainerHeight = Helper.calculateTableHeight() + 60
     },
     getElderList () {
       HouseAPI.getHouseElderList({houseId: 18}).then(res => {
@@ -177,14 +196,14 @@ export default {
 .box-container{
   background: #fff;
   padding: 20px;
-  /* float: left; */
-  /* width: calc(100% - 270px); */
+  float: left;
+  width: calc(100% - 270px);
 }
-/* .box-aside{
+.box-aside{
   float: right;
   width: 270px;
   padding-left: 10px;
-} */
+}
 .box-header{
   padding: 20px;
   text-align: center;
@@ -228,9 +247,9 @@ export default {
 .data-card p span{
   margin-right: 5px;
 }
-.data-card.info{
+/* .data-card.info{
   margin-top: 10px;
-}
+} */
 .data-card.info .item{
   margin-bottom: 10px;
   border-bottom: 1px solid #eee;
