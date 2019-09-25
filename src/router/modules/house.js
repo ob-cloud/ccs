@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-18 18:02:46
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 16:11:16
+ * @Last Modified time: 2019-09-25 16:13:22
  */
 
 const home = [
@@ -11,6 +11,13 @@ const home = [
     path: '/dashboard.html',
     desc: '首页',
     component: () => import('views/house/index.vue'),
+    isShow: true
+  },
+  {
+    name: '/dashboard/chart.html',
+    path: '/dashboard/chart.html',
+    desc: '床实时数据图表',
+    component: () => import('views/house/chart.vue'),
     isShow: true
   }
 ]

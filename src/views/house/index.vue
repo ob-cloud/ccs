@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-content">
             <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx">
-              <div slot="header" class="clearfix title">
+              <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}">
                 <span>{{item.deviceStatus}}</span>
               </div>
               <div class="text item">
@@ -26,8 +26,8 @@
           </div>
           <div class="list">
            <div class="item" v-for="(item, index) in houseMessage" :key="index">
-             <p class="desc">{{item.deviceType}} {{item.deviceStatus}}</p>
-             <span class="time">{{item.alarmTime}}</span>
+             <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.deviceType}}</p>
+             <span class="time">{{item.alarmTime | timeFormatFilter}}</span>
            </div>
           </div>
         </el-card>
@@ -71,6 +71,9 @@ export default {
     },
     deviceDataFilter (val) {
       return val ? val.toFixed(2) : 0
+    },
+    timeFormatFilter (val) {
+      return Helper.parseTime(val)
     }
   },
   computed: {
@@ -88,7 +91,7 @@ export default {
     records: {
       deep: true,
       handler (val) {
-        const target = this.elderList.find(item => item.serialId === val.serialId)
+        const target = this.elderList.find(item => item.bedId === val.bedId)
         if (target) {
           target.deviceStatus = val.deviceStatus
         }
@@ -151,7 +154,8 @@ export default {
                 try {
                   const record = JSON.parse(response.body)
                   if (record.type === 1) {
-                    this.houseMessage.unshift(record)
+                    const target = this.elderList.find(item => item.bedId === record.bedId) || {}
+                    this.houseMessage.unshift({...target, ...record})
                     that.$store.dispatch('setHouseAlarmMessage', this.houseMessage)
                   } else {
                     that.records = record
@@ -177,6 +181,32 @@ export default {
         this.stompClient.disconnect()
       }
     },
+    backgroundFilter (val) {
+      return {
+        '在床（静卧）': '#82e282',
+        '在床（体卧）': '#82e282',
+        '用户上床': '#82e282',
+        '用户离床': '#a2a2d4',
+        '离床': '#a2a2d4',
+        '离床未归': '#eca8a8',
+        '历史数据传输': 'azure',
+        '设备上传数据，正在分析状态': '#58e4e4',
+        '设备在线，暂时无响应': '#58e4e4',
+        '设备离线': '#b9b992',
+        '设备下线': '#b9b992',
+        '设备意外下线': '#b9b992',
+        '设备上线': '#58e4e4',
+        '心率过低（低于40次/分）': '#f7aeae',
+        '心率过高（高于110次/分）': '#f76d6d',
+        '心率异常（2分钟内变化超过50%）': '#ff3d3d',
+        '翻身护理提醒：体动过少': 'antiquewhite',
+        '翻身护理提醒：体动过多': '#ec931b',
+        '手动报警': '#ec2349',
+      }[val]
+    },
+    showBedChartInfo (serialId) {
+      this.$router.push({path: '/dashboard/chart.html', query: {serialId}})
+    }
   },
   beforeDestroy () {
     this.disconnect()
@@ -235,6 +265,11 @@ export default {
   padding: 10px 20px;
   font-size: 14px;
   text-align: center;
+
+  text-overflow: ellipsis;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 .box-card .text{
   font-size: 14px;
