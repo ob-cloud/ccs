@@ -9,7 +9,7 @@
                 <span>{{item.deviceStatus}}</span>
               </div>
               <div class="text item">
-                {{item.roomNo}} {{item.bedNo}} {{item.elderName}}
+                {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
                 <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate}}</el-button>
@@ -220,8 +220,10 @@ export default {
   text-align: center;
 }
 .box-content .box-card{
-  width: 140px;
-  height: 132px;
+  /* width: 140px;
+  height: 132px; */
+  width: 160px;
+  height: 140px;
   display: inline-block;
   margin-left: 10px;
   margin-bottom: 10px;
