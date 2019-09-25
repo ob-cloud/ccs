@@ -183,6 +183,7 @@ export default {
     },
     backgroundFilter (val) {
       return {
+        '水浸': '#13dbe6',
         '在床（静卧）': '#82e282',
         '在床（体卧）': '#82e282',
         '用户上床': '#82e282',
