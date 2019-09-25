@@ -2,13 +2,14 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:38:53
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-21 19:03:34
+ * @Last Modified time: 2019-09-25 11:27:26
  */
 
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from './modules/user'
 import menu from './modules/menu'
+import message from './modules/message'
 import getters from './getters'
 import actions from './actions'
 import mutations from './mutations'
@@ -23,7 +24,8 @@ const state = {
 const store = new Vuex.Store({
   modules: {
     user,
-    menu
+    menu,
+    message
   },
   state,
   getters,

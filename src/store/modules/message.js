@@ -2,19 +2,20 @@
  * @Author: eamiear
  * @Date: 2019-09-19 11:33:40
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-19 11:39:21
+ * @Last Modified time: 2019-09-25 11:39:14
  */
 
 import {
   SET_ALARM,
   SET_HOUSE_MESSAGE,
+  SET_MESSAGE_COUNT
 } from '../mutation-types'
-import Storage from '@/common/cache'
+// import Storage from '@/common/cache'
 
 const user = {
   state: {
     alarm: null,
-    houseMessage: null,
+    houseMessage: [],
     count: 0
   },
   mutations: {
@@ -29,8 +30,11 @@ const user = {
     }
   },
   actions: {
-    getUserInfo ({ commit, state }) {
-
+    setHouseAlarmMessage ({ commit, state }, message) {
+      return new Promise(resolve => {
+        commit('SET_HOUSE_MESSAGE', message)
+        resolve(message)
+      })
     }
   }
 }

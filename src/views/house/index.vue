@@ -25,9 +25,9 @@
             <span>消息</span>
           </div>
           <div class="list">
-           <div class="item" v-for="(item, index) in infoList" :key="index">
-             <p class="desc">{{item.message}}</p>
-             <span class="time">{{item.time}}</span>
+           <div class="item" v-for="(item, index) in houseMessage" :key="index">
+             <p class="desc">{{item.deviceType}} {{item.deviceStatus}}</p>
+             <span class="time">{{item.alarmTime}}</span>
            </div>
           </div>
         </el-card>
@@ -42,6 +42,7 @@ import Config from '@/common/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import Helper from '@/common/helper'
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -51,7 +52,6 @@ export default {
         label: 'label'
       },
       records: {},
-      infoList: [],
       boxContainerHeight: 700
     }
   },
@@ -69,6 +69,11 @@ export default {
       }
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
     }
+  },
+  computed: {
+    ...mapGetters([
+      'houseMessage'
+    ])
   },
   mounted () {
     this.fixLayout()
@@ -141,7 +146,13 @@ export default {
               response => {
                 console.log('----- ', response)
                 try {
-                  that.records = JSON.parse(response.body)
+                  const record = JSON.parse(response.body)
+                  if (record.type === 1) {
+                    this.houseMessage.unshift(record)
+                    that.$store.dispatch('setHouseAlarmMessage', this.houseMessage)
+                  } else {
+                    that.records = record
+                  }
                   console.log(that.records)
                 } catch (error) {
                   console.log('推送解析失败', error)
