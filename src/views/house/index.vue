@@ -12,8 +12,8 @@
                 {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate}}</el-button>
-                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure | deviceDataFilter}}</el-button>
               </div>
             </el-card>
           </div>
@@ -68,6 +68,9 @@ export default {
         2: '设备未绑定'
       }
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
+    },
+    deviceDataFilter (val) {
+      return val ? val.toFixed(2) : 0
     }
   },
   computed: {
