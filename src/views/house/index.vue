@@ -4,7 +4,7 @@
       <div class="box-container" style="overflow: auto" :style="{height: `${boxContainerHeight}px`}">
         <div class="box">
           <div class="box-content">
-            <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx">
+            <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx" :class="{'breath-mode': records.bedId === item.bedId}">
               <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}">
                 <span>{{item.deviceStatus}}</span>
               </div>
@@ -86,6 +86,12 @@ export default {
     this.getElderList()
     this.initWebSocket()
     Helper.windowOnResize(this, this.fixLayout)
+    // setInterval(() => {
+    //   this.records = {
+    //     bedId: [42, 41, 43, 39, 38, 37, 40][Math.floor(Math.random() * 4)]
+    //   }
+    //   console.log('push ', this.records)
+    // }, 5000)
   },
   watch: {
     records: {
@@ -314,7 +320,28 @@ export default {
   font-size: 12px;
   color: #999;
 }
+.breath-mode {
+  animation-timing-function: ease-in-out;
+  animation-name: breathe;
+  animation-duration: 2700ms;
+  animation-iteration-count: 2;
+  animation-direction: alternate;
+}
+@keyframes breathe {
+  0% {
+    opacity: .7;
+    /* box-shadow: 0 1px 2px rgba(255, 255, 255, 0.1); */
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  }
 
+  100% {
+    opacity: 1;
+    /* border: 1px solid rgba(59, 235, 235, 1);
+    box-shadow: 0 1px 30px rgba(59, 255, 255, 1); */
+    border: 1px solid rgb(243, 68, 68);
+    box-shadow: 0 1px 30px rgb(243, 68, 68);
+  }
+}
 </style>
 <style lang="scss">
 .box-card .el-card__body{
