@@ -112,32 +112,95 @@ export default {
     },
     getColumns () {
       return [{
+        type: 'expand',
+        renderBody (h, row) {
+          return [
+            <el-form label-position="left" inline class="elder-table__detail">
+              <el-row>
+                <el-col span={8}>
+                  <el-form-item label="性别" class="detail-item">
+                    <span>{row.gender === 1 ? '女' : '男'}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="年龄">
+                    <span>{row.age}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="生日">
+                    <span>{row.birthday}</span>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col span={8}>
+                  <el-form-item label="民族">
+                    <span>{row.nation}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="身份证">
+                    <span>{row.idcard}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="联系人">
+                    <span>{row.contacts}</span>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col span={8}>
+                  <el-form-item label="入住时间">
+                    <span>{row.checkInTime && Helper.parseTime(row.checkInTime)}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="退院时间">
+                    <span>{row.checkOutTime && Helper.parseTime(row.checkOutTime)}</span>
+                  </el-form-item>
+                </el-col>
+                <el-col span={8}>
+                  <el-form-item label="联系人号码">
+                    <span>{row.contactsPhone}</span>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+            </el-form>
+          ]
+        }
+      }, {
         label: '老人姓名',
         prop: 'name',
+        // width: '90px',
         align: 'center'
       }, {
         label: '手机号码',
         prop: 'phoneNumber',
+        // width: '120px',
         align: 'center'
       }, {
         label: '机构类型',
-        prop: 'phoneNumber',
+        prop: 'type',
         align: 'center',
+        // width: '90px',
         formatter (val) {
           return val === 1 ? '居家老人' : '机构老人'
         }
       }, {
-        label: '房号',
-        prop: 'roomNo',
-        align: 'center'
-      }, {
-        label: '床号',
+        label: '房床号',
         prop: 'bedNo',
-        align: 'center'
+        align: 'center',
+        // width: '120px',
+        formatter (val, row) {
+          return `${row.roomNo || ''} - ${val || ''}`
+        }
       }, {
         label: '住院状态',
         prop: 'status',
         align: 'center',
+        // width: '90px',
         formatter (val) {
           return val === 1 ? '在住' : '退院'
         }
@@ -145,33 +208,45 @@ export default {
         label: '费用状况',
         prop: 'feeStatus',
         align: 'center',
+        // width: '90px',
         formatter (val) {
           return val === 1 ? '无欠费' : '欠费'
         }
       }, {
         label: '住址',
         prop: 'address',
+        minWidth: '160px',
         align: 'center'
-      }, {
-        label: '联系人',
-        prop: 'contacts',
-        align: 'center'
-      }, {
-        label: '联系人号码',
-        prop: 'contactsPhone',
-        align: 'center'
-      }, {
-        label: '入住时间',
-        prop: 'checkInTime',
-        align: 'center'
-      }, {
-        label: '退院时间',
-        prop: 'checkOutTime',
-        align: 'center'
-      }, {
+      },
+      // {
+      //   label: '联系人',
+      //   prop: 'contacts',
+      //   align: 'center'
+      // }, {
+      //   label: '联系人号码',
+      //   prop: 'contactsPhone',
+      //   align: 'center'
+      // },
+      // {
+      //   label: '入住时间',
+      //   prop: 'checkInTime',
+      //   align: 'center',
+      //   formatter (val) {
+      //     return val && Helper.parseTime(val)
+      //   }
+      // },
+      // {
+      //   label: '退院时间',
+      //   prop: 'checkOutTime',
+      //   align: 'center',
+      //   formatter (val) {
+      //     return val && Helper.parseTime(val)
+      //   }
+      // },
+      {
         label: '操作',
         align: 'center',
-        minWidth: '180px',
+        minWidth: '100px',
         renderBody: this.getToolboxRender
       }]
     },
@@ -331,5 +406,12 @@ export default {
 .content{
   padding: 20px;
 }
-
+</style>
+<style>
+.elder-table__detail .el-form-item{
+  margin-bottom: 0;
+}
+.elder-table__detail .el-form-item span{
+  color: #999;
+}
 </style>
