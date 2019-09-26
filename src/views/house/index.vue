@@ -5,7 +5,7 @@
         <div class="box">
           <div class="box-content">
             <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx" :class="{'breath-mode': records.bedId === item.bedId}">
-              <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}">
+              <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
                 <span>{{item.deviceStatus}}</span>
               </div>
               <div class="text item">
@@ -52,6 +52,7 @@ export default {
         label: 'label'
       },
       records: {},
+      ticket: null,
       boxContainerHeight: 700
     }
   },
@@ -86,21 +87,32 @@ export default {
     this.getElderList()
     this.initWebSocket()
     Helper.windowOnResize(this, this.fixLayout)
-    // setInterval(() => {
-    //   this.records = {
-    //     bedId: [42, 41, 43, 39, 38, 37, 40][Math.floor(Math.random() * 4)]
-    //   }
-    //   console.log('push ', this.records)
-    // }, 5000)
+    this.ticket = setInterval(() => {
+      this.getElderList()
+      console.log('interval...')
+    }, 10000)
   },
   watch: {
     records: {
       deep: true,
       handler (val) {
+        console.log('watch records ', val)
+        if (!val || (val && !Object.keys(val).length)) return
+        // let target = null
+        // if (val.deviceType === 'third') {
+        //   target = this.elderList.find(item => item.serialId === val.serialId)
+        // } else {
+        //   target = this.elderList.find(item => item.bedId === val.bedId)
+        // }
         const target = this.elderList.find(item => item.bedId === val.bedId)
+        console.log('found target', target)
         if (target) {
           target.deviceStatus = val.deviceStatus
         }
+        // setTimeout(() => {
+        //   this.records = {}
+        //   console.log('setTimeout ', this.records)
+        // }, 3500)
       }
     }
   },
@@ -164,7 +176,10 @@ export default {
                     this.houseMessage.unshift({...target, ...record})
                     that.$store.dispatch('setHouseAlarmMessage', this.houseMessage)
                   } else {
-                    that.records = record
+                    that.records.bedId = -1
+                    setTimeout(() => {
+                      that.records = record || {}
+                    }, 0)
                   }
                   console.log(that.records)
                 } catch (error) {
@@ -192,6 +207,7 @@ export default {
         '水浸': '#13dbe6',
         '在床（静卧）': '#82e282',
         '在床（体卧）': '#82e282',
+        '在床（体动）': '#82e282',
         '用户上床': '#82e282',
         '用户离床': '#a2a2d4',
         '离床': '#a2a2d4',
@@ -218,6 +234,7 @@ export default {
   beforeDestroy () {
     this.disconnect()
     clearInterval(this.timer)
+    clearInterval(this.ticket)
   }
 }
 </script>
