@@ -36,13 +36,14 @@
             <el-radio :label="2">公办民营</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="位置" class="address" prop="address">
+        <el-form-item label="位置" class="address" prop="addressDetail">
            <el-cascader
+            filterable
             :options="addressOptions"
-            v-model="houseModel.address"
+            v-model="houseModel.addressDetail"
             @change="onAddressChange">
           </el-cascader>
-          <el-input class="caption-item detail" placeholder="详细地址" v-model="houseModel.addressDetail"></el-input>
+          <el-input class="caption-item detail" placeholder="详细地址" v-model="houseModel.address"></el-input>
         </el-form-item>
         <el-form-item label="经纬度" class="coors" prop="lng">
           <el-input class="caption-item w8" placeholder="经度" v-model="houseModel.lng"></el-input>
@@ -86,6 +87,9 @@ export default {
       },
       houseModel: {
         name: '',
+        provinceId: '',
+        cityId: '',
+        areaId: '',
         address: '',
         addressDetail: '',
         lng: '',
@@ -108,6 +112,15 @@ export default {
   },
   computed: {
 
+  },
+  watch: {
+    'houseModel.addressDetail' (val) {
+      if (val && val.length) {
+        this.houseModel.provinceId = val[0]
+        this.houseModel.cityId = val[1]
+        this.houseModel.areaId = val[2]
+      }
+    }
   },
   components: { BaseTable },
   created () {
@@ -194,7 +207,7 @@ export default {
     },
     getAddressList () {
       SystemAPI.getAddressList().then(res => {
-        this.addressOptions = res.data.records
+        this.addressOptions = Helper.formatAreaTree(res.data)
       })
     },
     onCurrentChange (pageNo) {
@@ -224,7 +237,7 @@ export default {
             '添加养老院': 'createHouse',
             '编辑养老院': 'updateHouse'
           }[this.dialogAction]
-          this.houseModel.address = this.houseModel.addressDetail
+          this.houseModel.address = this.houseModel.address
           HouseAPI[methods]({...this.houseModel, ...{lng: +this.houseModel.lng, lat: +this.houseModel.lat}}).then(res => {
             if (res.code === 0) {
               this.$message({

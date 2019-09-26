@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-19 10:38:33
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-24 17:44:40
+ * @Last Modified time: 2019-09-26 10:38:42
  */
 
 const _toString = Object.prototype.toString
@@ -134,6 +134,47 @@ export const Helper = {
       message
     })
   },
+  formatAreaTree (areaList) {
+    if (!areaList || !areaList.length) return
+    const areaMap = []
+    const areaTreeList = []
+    areaList.forEach(area => {
+      if (areaMap.indexOf(area.provinceId) === -1) {
+        areaMap.push(area.provinceId)
+        areaTreeList.push({
+          value: area.provinceId,
+          label: area.provinceName,
+          children: [{
+            value: area.cityId,
+            label: area.cityName,
+            children: [{
+              value: area.areaId,
+              label: area.areaName
+            }]
+          }]
+        })
+      } else {
+        const citys = areaTreeList[areaMap.indexOf(area.provinceId)].children
+        const currentCity = citys.find(city => city.value === area.cityId)
+        if (currentCity) {
+          currentCity.children.push({
+            value: area.areaId,
+            label: area.areaName
+          })
+        } else {
+          citys.push({
+            value: area.cityId,
+            label: area.cityName,
+            children: [{
+              value: area.areaId,
+              label: area.areaName
+            }]
+          })
+        }
+      }
+    })
+    return areaTreeList
+  }
 }
 
 export default Helper

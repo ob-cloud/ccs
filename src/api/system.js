@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-24 18:03:21
+ * @Last Modified time: 2019-09-26 09:53:24
  */
 
 import request from '@/common/fetch'
@@ -10,7 +10,7 @@ import request from '@/common/fetch'
 
 const SystemAPI = {
   getAddressList () {
-    return request.get('/common/address')
+    return request.get('nursinghome/ccs/common/queryarea')
   },
   getNactionList () {
     return request.get('/dict/nation/list')
