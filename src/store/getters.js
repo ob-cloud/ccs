@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:36:28
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-29 15:31:06
+ * @Last Modified time: 2019-09-29 15:48:34
  */
 
 export default {
@@ -20,5 +20,6 @@ export default {
   sidebarCollapse: state => state.sidebarCollapse,
   documentClientHeight: state => state.documentClientHeight,
   houseList: state => state.houseList,
+  house: state => state.house,
   houseId: state => state.houseId
 }

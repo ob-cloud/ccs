@@ -2,15 +2,15 @@
  * @Author: eamiear
  * @Date: 2019-09-21 21:41:59
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-24 18:03:20
+ * @Last Modified time: 2019-09-29 16:20:48
  */
 
 import request from '@/common/fetch'
-
+import store from '@/store'
 const RoomAPI = {
   getRoomList (params) {
     return request.get('nursinghome/ccs/room/list', {
-      houseId: 18,
+      houseId: store.state.house.id,
       ...params
     })
   },

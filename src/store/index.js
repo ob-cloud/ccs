@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:38:53
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-29 15:29:14
+ * @Last Modified time: 2019-09-29 16:18:55
  */
 
 import Vue from 'vue'
@@ -13,6 +13,7 @@ import message from './modules/message'
 import getters from './getters'
 import actions from './actions'
 import mutations from './mutations'
+import {cacher} from '@/common/cache'
 
 Vue.use(Vuex)
 
@@ -20,6 +21,7 @@ const state = {
   sidebarCollapse: false,
   documentClientHeight: 0,
   houseList: [],
+  house: cacher.setStrategy('sessionStorage').get('active_house'),
   houseId: ''
 }
 

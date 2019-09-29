@@ -30,12 +30,12 @@ export default {
       let defaults = {}
       if (this.houseList.length) {
         defaults = this.houseList[0]
-        this.$store.dispatch('setHouseId', defaults.id)
+        this.$store.dispatch('setHouse', defaults)
       }
       return defaults
     }
   },
-  mounted() {
+  mounted () {
   },
   methods: {
     dashboard () {
@@ -43,11 +43,11 @@ export default {
       this.$router.push({path: '/dashboard.html'})
     },
     handleCommand (command) {
-      if (command) {
-        this.$store.dispatch('setHouseId', command).then(res => {
-          location.reload()
-        })
-      }
+      if (!command || command === this.defaultHouse.id) return
+      const house = this.houseList.find(item => item.id === command)
+      this.$store.dispatch('setHouse', house).then(res => {
+        location.reload()
+      })
     }
   }
 }
