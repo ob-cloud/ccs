@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:38:53
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-25 11:27:26
+ * @Last Modified time: 2019-09-29 15:29:14
  */
 
 import Vue from 'vue'
@@ -18,7 +18,9 @@ Vue.use(Vuex)
 
 const state = {
   sidebarCollapse: false,
-  documentClientHeight: 0
+  documentClientHeight: 0,
+  houseList: [],
+  houseId: ''
 }
 
 const store = new Vuex.Store({

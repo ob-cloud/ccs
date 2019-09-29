@@ -2,10 +2,12 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:36:35
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 17:02:06
+ * @Last Modified time: 2019-09-29 15:26:34
  */
 export const COLLAPSE_SIDEBAR = 'COLLAPSE_SIDEBAR'
 export const UPDATE_DOCUMENT_CLIENT_HEIGHT = 'UPDATE_DOCUMENT_CLIENT_HEIGHT'
+export const SET_HOUSELIST = 'SET_HOUSELIST'
+export const SET_HOUSEID = 'SET_HOUSEID'
 
 // menu mutations
 export const SET_MENU_NAV_LIST = 'SET_MENU_NAV_LIST'

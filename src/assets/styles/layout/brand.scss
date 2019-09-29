@@ -36,4 +36,24 @@
       margin-right: 5px;
     }
   }
+
+  > .dropdown{
+    padding: 0 20px;
+    font-size: 12px;
+    color: #999;
+    font-family: 宋体;
+    float: right;
+    margin-top: 6px;
+    // width: 110px;
+    // line-height: 60px;
+
+    .name{
+      float: left;
+      display: inline-block;
+      width: 70px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
 }

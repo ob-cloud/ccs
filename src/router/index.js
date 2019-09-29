@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 18:10:12
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-22 17:12:19
+ * @Last Modified time: 2019-09-29 11:44:31
  */
 
 import Vue from 'vue'
@@ -25,6 +25,7 @@ router.beforeEach((to, from, next) => {
   NProgress.start()
   if (Storage.getToken()) {
     store.dispatch('generateNavibarMenu')
+    store.dispatch('setHouseList')
     to.path === '/login' ? next({ path: '/' }) : next()
   } else {
     to.path.includes('/login') ? next() : next({ path: '/login' })
