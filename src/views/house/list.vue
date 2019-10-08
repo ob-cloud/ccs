@@ -20,7 +20,16 @@
           <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
         </template>
         <template slot="actionBar">
-          <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加养老院</el-button>
+          <el-dropdown trigger="click" @command="handleCommand">
+            <el-button type="primary" icon="el-icon-plus">
+              添加<i class="el-icon-arrow-down el-icon--right"></i>
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="house">添加养老院</el-dropdown-item>
+              <el-dropdown-item command="community">添加社区</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+          <!-- <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加养老院</el-button> -->
         </template>
       </slot>
     </base-table>
@@ -28,6 +37,9 @@
       <el-form ref="houseForm" :rules="houseModelRules" :model="houseModel" label-width="100px">
         <el-form-item label="名称" prop="name">
           <el-input class="caption-item w8" placeholder="养老院名称" v-model="houseModel.name"></el-input>
+        </el-form-item>
+        <el-form-item label="类型" prop="original">
+          <span class="caption-item w8">{{houseModel.original | originalFilter}}</span>
         </el-form-item>
         <el-form-item label="性质">
           <el-radio-group v-model="houseModel.type" prop="type">
@@ -88,6 +100,7 @@ export default {
       houseModel: {
         name: '',
         provinceId: '',
+        original: 0,
         cityId: '',
         areaId: '',
         address: '',
@@ -113,12 +126,22 @@ export default {
   computed: {
 
   },
+  filters: {
+    originalFilter (val) {
+      return val === 0 ? '养老院' : '社区'
+    }
+  },
   watch: {
     'houseModel.addressDetail' (val) {
       if (val && val.length) {
         this.houseModel.provinceId = val[0]
         this.houseModel.cityId = val[1]
         this.houseModel.areaId = val[2]
+      }
+    },
+    createDialogVisible (val) {
+      if (val === false) {
+        this.$refs.houseForm.resetFields()
       }
     }
   },
@@ -235,9 +258,11 @@ export default {
         if (valid) {
           const methods = {
             '添加养老院': 'createHouse',
+            '添加社区': 'createHouse',
             '编辑养老院': 'updateHouse'
           }[this.dialogAction]
-          this.houseModel.address = this.houseModel.address
+          // this.houseModel.address = this.houseModel.address
+          console.log('==== ', this.houseModel)
           HouseAPI[methods]({...this.houseModel, ...{lng: +this.houseModel.lng, lat: +this.houseModel.lat}}).then(res => {
             if (res.code === 0) {
               this.$message({
@@ -303,6 +328,18 @@ export default {
     handleCheckRoom (house) {
       this.$router.push({path: '/room/index.html', query: {id: house.id, path: this.$route.path, name: house.name}})
     },
+    handleCommand (command) {
+      // this.houseModel = {}
+      if (command === 'house') {
+        this.dialogAction = '添加养老院'
+        this.houseModel.original = 0
+      } else {
+        this.dialogAction = '添加社区'
+        this.houseModel.original = 1
+      }
+      this.createDialogVisible = true
+      !this.addressOptions.length && this.getAddressList()
+    }
   }
 }
 </script>
