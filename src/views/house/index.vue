@@ -89,14 +89,12 @@ export default {
     Helper.windowOnResize(this, this.fixLayout)
     this.ticket = setInterval(() => {
       this.getElderList()
-      console.log('interval...')
     }, 10000)
   },
   watch: {
     records: {
       deep: true,
       handler (val) {
-        console.log('watch records ', val)
         if (!val || (val && !Object.keys(val).length)) return
         // let target = null
         // if (val.deviceType === 'third') {
@@ -105,21 +103,13 @@ export default {
         //   target = this.elderList.find(item => item.bedId === val.bedId)
         // }
         const target = this.elderList.find(item => item.bedId === val.bedId)
-        console.log('found target', target)
         if (target) {
           target.deviceStatus = val.deviceStatus
         }
-        // setTimeout(() => {
-        //   this.records = {}
-        //   console.log('setTimeout ', this.records)
-        // }, 3500)
       }
     }
   },
   methods: {
-    // fixLayout () {
-    //   this.boxContainerHeight = window.document.body.clientHeight - 50 - 20 - 10
-    // },
     fixLayout () {
       this.boxContainerHeight = Helper.calculateTableHeight() + 60
     },
@@ -181,7 +171,6 @@ export default {
                       that.records = record || {}
                     }, 0)
                   }
-                  console.log(that.records)
                 } catch (error) {
                   console.log('推送解析失败', error)
                 }

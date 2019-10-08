@@ -262,7 +262,6 @@ export default {
             '编辑养老院': 'updateHouse'
           }[this.dialogAction]
           // this.houseModel.address = this.houseModel.address
-          console.log('==== ', this.houseModel)
           HouseAPI[methods]({...this.houseModel, ...{lng: +this.houseModel.lng, lat: +this.houseModel.lat}}).then(res => {
             if (res.code === 0) {
               this.$message({
