@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-02-06 21:34:24
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-26 09:53:24
+ * @Last Modified time: 2019-10-11 17:44:25
  */
 
 import request from '@/common/fetch'
@@ -29,7 +29,7 @@ const SystemAPI = {
     //     password
     //   }
     // })
-    return request.postForm('/oauth/token', {password, username, grant_type: 'password'})
+    return request.postForm('nursinghome/oauth/token', {password, username, grant_type: 'password'})
   },
   logout (accessToken) {
     // return request.post({
