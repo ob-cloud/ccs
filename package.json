@@ -11,8 +11,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "blueimp-md5": "^2.10.0",
-    "echarts": "^4.3.0",
+    "echarts": "^4.4.0",
     "element-ui": "^2.5.4",
+    "iscroll": "^5.2.0",
     "lodash": "^4.17.11",
     "md5": "^2.2.1",
     "nprogress": "^0.2.0",

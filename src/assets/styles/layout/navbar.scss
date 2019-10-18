@@ -56,12 +56,18 @@
     // }
 
   }
+  .el-menu--horizontal > .el-menu-item {
+    color: #303133;
+  }
   .el-menu--horizontal.el-menu.sys-menu-nav{
     vertical-align: middle;
     margin-right: 0;
   }
   .el-menu--horizontal > .el-menu-item.is-active{
     border-bottom-width: 1px;
+    color: #fff;
+    background-color: #409EFF;
+    font-weight: bold;
   }
   .el-menu--horizontal.sys-menu-nav > .el-menu-item.is-active{
     border-bottom-width: 0;

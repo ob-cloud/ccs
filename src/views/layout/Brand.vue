@@ -1,5 +1,5 @@
 <template>
-  <a href="javascript:void(0)" class="brand">
+  <a href="javascript:void(0)" class="brand color-navbar">
     <span class="brand-label" @click="dashboard">昂宝养老看护系统</span>
     <el-dropdown class="dropdown" trigger="click" @command="handleCommand">
       <span class="el-dropdown-link">
@@ -52,3 +52,9 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.color-navbar  .dropdown {
+  color: #303133;
+  font-weight: bold;
+}
+</style>

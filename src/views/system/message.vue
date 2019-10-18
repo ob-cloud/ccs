@@ -1,12 +1,13 @@
 <template>
   <div class="message">
     <el-tabs v-model="activeName" @tab-click="onTabClick">
-      <el-tab-pane label="未处理消息" name="unhandle">
+      <el-tab-pane label="消息列表" name="unhandle">
         <base-table
+          :row-class-name="tableRowClassName"
           :height="tableHeight"
           :tableData="tableData"
           :columns="columns"
-          stripe border
+          border
           v-loading="tableLoading"
           :pageTotal="total"
           :pageSize="search.pageSize"
@@ -14,7 +15,7 @@
           @on-page-size-change="onSizeChange">
         </base-table>
       </el-tab-pane>
-      <el-tab-pane label="三天消息" name="days">
+      <!-- <el-tab-pane label="三天消息" name="days">
         <base-table
           :height="tableHeight"
           :tableData="tableData"
@@ -39,14 +40,14 @@
           @on-current-page-change="onCurrentChange"
           @on-page-size-change="onSizeChange">
         </base-table>
-      </el-tab-pane>
+      </el-tab-pane> -->
     </el-tabs>
-
   </div>
 </template>
 
 <script>
 import BaseTable from '@/assets/package/table-base'
+import NurseAPI from '@/api/nurse'
 // import MessageAPI from '@/api/message'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 export default {
@@ -71,38 +72,34 @@ export default {
   components: { BaseTable },
   created () {
     this.columns = this.getColumns()
-    this.getMessageList()
+    // this.getMessageList()
+    this.getCalltask()
   },
   methods: {
     getColumns () {
       const columns = [{
-        label: '设备名称',
-        prop: 'deviceName',
+        label: '任务ID',
+        prop: 'callTaskId',
         align: 'center'
       }, {
-        label: 'IMIE号',
-        prop: 'imie',
+        label: '姓名',
+        prop: 'elderName',
         align: 'center'
       }, {
-        label: '报警类型',
-        prop: 'alarmType',
+        label: '事件',
+        prop: 'callTaskName',
         align: 'center'
       }, {
         label: '报警时间',
-        prop: 'datetime',
+        prop: 'execTime',
         align: 'center'
       }, {
-        label: '定位时间',
-        prop: 'loctime',
-        align: 'center'
-      }, {
-        label: '型号',
-        prop: 'model',
-        align: 'center'
-      }, {
-        label: '状态',
+        label: '完成时间',
+        prop: 'completeTime',
         align: 'center',
-        prop: 'status'
+        formatter (val) {
+          return val || '未完成'
+        }
       }]
       if (this.activeName === 'offline') {
         columns[3].label = '离线时间'
@@ -173,6 +170,22 @@ export default {
       this.columns = this.getColumns()
       this.tableData = []
       this.getMessageList()
+    },
+    getCalltask () {
+      this.tableLoading = true
+      NurseAPI.getCalltask().then(resp => {
+        console.log(resp)
+        this.tableLoading = false
+        if (resp.code === 0 && resp.data && resp.data.records) {
+          this.tableData = resp.data.records || []
+        }
+      }).catch(err => {
+        this.tableLoading = false
+        console.log(err)
+      })
+    },
+    tableRowClassName ({row, rowIndex}) {
+      return row.completeTime ? 'color-green' : 'color-red'
     }
   }
 }
@@ -181,5 +194,13 @@ export default {
 <style scoped>
 .message{
   padding: 20px;
+}
+</style>
+<style lang="scss">
+.el-table .color-green {
+  background: rgba(0, 128, 0, 0.3);
+}
+.el-table .color-red {
+  background: rgba(255, 0, 0, 0.3);
 }
 </style>

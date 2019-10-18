@@ -14,6 +14,7 @@ module.exports = {
       '/oauth': {
         // target: 'https://alicloud.on-bright.com',
         target: 'https://aliiot.on-bright.com',
+        // target: 'https://10.10.92.161:8401',
         // target: 'http://192.168.200.108:9999',
         ws: true,
         changeOrigin: true
@@ -21,6 +22,7 @@ module.exports = {
       '/nursinghome': {
         // target: 'https://alicloud.on-bright.com',
         target: 'https://aliiot.on-bright.com',
+        // target: 'https://10.10.92.161:8401',
         // target: 'http://192.168.200.101',
         // target: 'http://192.168.200.108:9999',
         ws: true,

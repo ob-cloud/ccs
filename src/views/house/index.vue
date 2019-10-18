@@ -3,32 +3,76 @@
     <section class="app-body clearfix">
       <div class="box-container" style="overflow: auto" :style="{height: `${boxContainerHeight}px`}">
         <div class="box">
-          <div class="box-content">
+          <el-row type="flex" class="row-bg box_title" justify="center">
+            <p class="box_title-left">
+              <i class="el-icon-tickets text-number"></i>
+              组织数：<span class="text-number">555</span>
+              <br>
+              <i class="el-icon-news text-number"></i>
+              员工数：<span class="text-number">231</span>
+            </p>
+             <p class="box_title-center">
+              工单总数：<span class="text-number">3021546</span><sub> 个</sub>
+              <br>
+              床位总数：<span class="text-number">3251</span> <sub> 个</sub>
+            </p>
+            <p  class="box_title-right">
+              服务总时间：<span class="text-number">9542.21</span> <sub> 小时</sub>
+              <br>
+              一周工单数：<span class="text-number">1321</span> <sub> 个</sub>
+            </p>
+          </el-row>
+          <div class="box-content" v-if="elderList.length">
             <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx" :class="{'breath-mode': records.bedId === item.bedId}">
               <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
                 <span>{{item.deviceStatus}}</span>
               </div>
-              <div class="text item">
+              <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
                 {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
                 <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
                 <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure | deviceDataFilter}}</el-button>
               </div>
+              <div class="bottom clearfix">
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+              </div>
             </el-card>
+          </div>
+          <div  class="reload-news" v-else >
+            <el-button type="primary"  size="small" title="心率" @click="getElderList">重新获取数据....</el-button>
           </div>
         </div>
       </div>
-      <div class="box-aside">
-        <el-card class="data-card info" style="overflow: auto" :style="{height: `${boxContainerHeight}px`}">
+      <div class="box-aside" :style="{height: `${boxContainerHeight}px`}">
+        <el-card class="data-card info" style="overflow: auto;height: 49%" >
+          <div slot="header" class="">
+            <span>今日服务数据</span>
+          </div>
+          <div class="list-parent" id="wrapper" ref="listParent">
+            <div class="list" ref="list">
+              <div class="item" v-for="(item, index) in todayServerList" :key="index" >
+                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
+                <span class="time">&nbsp;{{item.execTime}}</span>
+              </div>
+            </div>
+          </div>
+        </el-card>
+        <el-card class="data-card info" style="overflow: auto;height: 49%" >
           <div slot="header" class="">
             <span>消息</span>
           </div>
-          <div class="list">
-           <div class="item" v-for="(item, index) in houseMessage" :key="index">
-             <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.deviceType}}</p>
-             <span class="time">{{item.alarmTime | timeFormatFilter}}</span>
-           </div>
+          <div class="list-parent"  id="wrapper2" ref="listParent">
+            <div class="list" v-bind:class="{ 'open-scroll' : openSroll}" ref="list">
+              <div class="item" v-for="(item, index) in houseMessage" :key="index" @click="dealMessage(item)">
+                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
+                <span class="time">&nbsp;{{item.execTime}}</span>
+              </div>
+              <!-- <div class="item" v-for="(item, index) in testList" :key="index + '-1'" @click="dealMessage(item)">
+                <p class="desc">{{item.text}}</p>
+                <span class="time">2013:12:21</span>
+              </div> -->
+            </div>
           </div>
         </el-card>
       </div>
@@ -38,11 +82,14 @@
 
 <script>
 import HouseAPI from '@/api/house'
+import IScroll from 'iscroll'
+import NurseAPI from '@/api/nurse'
 import Config from '@/common/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import Helper from '@/common/helper'
 import { mapGetters } from 'vuex'
+import { setInterval } from 'timers'
 export default {
   data () {
     return {
@@ -53,7 +100,76 @@ export default {
       },
       records: {},
       ticket: null,
-      boxContainerHeight: 700
+      boxContainerHeight: 700,
+      scrollTime: null,
+      scrollTime2: null,
+      openSroll: false,
+      todayServerList: [{
+        'id': 1,
+        'roomNo': 'B102',
+        'elderName': '刘秋菊',
+        'bedNo': 'B3',
+        'callTaskName': '测量血压体温并记录',
+        'execTime': '2019-10-17 10:24:44'
+      }, {
+        'id': 2,
+        'roomNo': 'B103',
+        'elderName': '黄观勤',
+        'bedNo': 'B1',
+        'callTaskName': '喂老人吃饭吃药',
+        'execTime': '2019-10-17 11:24:44'
+      }, {
+        'id': 3,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 4,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 5,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 6,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 7,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 8,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }, {
+        'id': 9,
+        'roomNo': 'B104',
+        'elderName': '朱美婵',
+        'bedNo': 'B1',
+        'callTaskName': '帮助肢体活动',
+        'execTime': '2019-10-17 13:24:44'
+      }],
+      myScroll: null,
+      myScroll2: null
     }
   },
   filters: {
@@ -90,6 +206,12 @@ export default {
     this.ticket = setInterval(() => {
       this.getElderList()
     }, 10000)
+    this.$nextTick(() => {
+      // this.ifScroll();
+      this.myScroll = new IScroll('#wrapper', {
+        snap: true
+      })
+    })
   },
   watch: {
     records: {
@@ -111,7 +233,7 @@ export default {
   },
   methods: {
     fixLayout () {
-      this.boxContainerHeight = Helper.calculateTableHeight() + 60
+      this.boxContainerHeight = Helper.calculateTableHeight() + 80
     },
     getElderList () {
       HouseAPI.getHouseElderList({houseId: 18}).then(res => {
@@ -163,8 +285,16 @@ export default {
                   const record = JSON.parse(response.body)
                   if (record.type === 1) {
                     const target = this.elderList.find(item => item.bedId === record.bedId) || {}
-                    this.houseMessage.unshift({...target, ...record})
+                    clearTimeout(this.scrollTime)
+                    if (this.scrollTime2) {
+                      this.testList.splice(1, 0, {...target, ...record})
+                    } else {
+                      this.houseMessage.unshift({...target, ...record})
+                    }
                     that.$store.dispatch('setHouseAlarmMessage', this.houseMessage)
+                    this.$nextTick(() => {
+                      this.ifScroll()
+                    })
                   } else {
                     that.records.bedId = -1
                     setTimeout(() => {
@@ -218,17 +348,57 @@ export default {
     },
     showBedChartInfo (serialId) {
       this.$router.push({path: '/dashboard/chart.html', query: {serialId}})
+    },
+    ifScroll () {
+      const parentH = this.$refs.listParent.offsetHeight
+      const listH = this.$refs.list.offsetHeight
+      if (listH > parentH) {
+        // 开启滚动定时器
+        this.scrollTime = setTimeout(() => {
+          this.openSroll = true
+          this.scrollTime2 = setTimeout(() => {
+            this.openSroll = false
+            // this.testList.push(this.testList.shift())
+            this.houseMessage.push(this.houseMessage.shift())
+            this.scrollTime2 = null
+            this.ifScroll()
+          }, 2000)
+        }, 4000)
+      }
+      this.myScroll2 = new IScroll('#wrapper2', {
+        snap: true
+      })
+    },
+    dealMessage (item) {
+      this.$confirm(`是否完成任务 ( ${item.elderName}：${item.callTaskName} )`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        NurseAPI.updateTask(item.callTaskId).then(resp => {
+          this.$store.dispatch('setHouseAlarmMessage', this.houseMessage.filter(ele => ele !== item))
+          this.$message.success(`任务 ( ${item.elderName}：${item.callTaskName} ),已确认`)
+        }).catch(err => {
+          this.$message.error(`确认失败：${err.message}`)
+        })
+      }).catch(err => {
+        console.log(err)
+        console.log('cancel')
+      })
     }
   },
   beforeDestroy () {
     this.disconnect()
     clearInterval(this.timer)
     clearInterval(this.ticket)
+    clearTimeout(this.scrollTime)
+    clearTimeout(this.scrollTime2)
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$ob-blue: rgb(0, 91, 172);
 .app-container {
   width: 100%;
   height: 100%;
@@ -250,16 +420,58 @@ export default {
 .app-body{
   /* margin-left: 200px; */
 }
+.reload-news {
+  text-align: center;
+  margin-top: 50px;
+}
 .box-container{
   background: #fff;
+  background: linear-gradient(to bottom, rgb(11, 20, 27) 0%, rgb(39, 45, 83) 50%, rgb(17, 33, 46) 100%);
   padding: 20px;
   float: left;
   width: calc(100% - 270px);
+  .box_title {
+    background-color: rgba(11, 20, 27, 0.3);
+    margin: 0 10px 20px;
+    padding: 10px 0;
+    .box_title-left,.box_title-right,.box_title-center {
+      line-height: 30px;
+      font-size: 24px;
+      font-weight: bold;
+      .text-number {
+        color:#fff;
+      }
+      color: $ob-blue;
+    }
+    .box_title-center {
+      padding: 0 60px;
+    }
+  }
 }
 .box-aside{
   float: right;
-  width: 270px;
-  padding-left: 10px;
+  width: 260px;
+  margin-left: 10px;
+  background: linear-gradient(to bottom, rgb(3, 22, 37) 0%, rgb(16, 25, 88) 50%, rgb(17, 33, 46) 100%);
+}
+.box-aside .el-card {
+  transition: 0ms;
+  margin-bottom: 1%;
+  background-color: transparent;
+  border: none;
+  color: #fff;
+}
+.box-aside .list-parent {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  box-shadow: 0 2px 12px 0 rgba(252, 252, 252, 0.3);
+}
+.box-aside .list-parent .open-scroll{
+  position:relative;
+  animation:mymove 2s 1;
+  /* animation-fill-mode:forwards; */
 }
 .box-header{
   padding: 20px;
@@ -269,7 +481,7 @@ export default {
   /* width: 140px;
   height: 132px; */
   width: 160px;
-  height: 140px;
+  height: 160px;
   display: inline-block;
   margin-left: 10px;
   margin-bottom: 10px;
@@ -288,6 +500,9 @@ export default {
   font-size: 14px;
   text-align: center;
   padding-bottom: 10px;
+  overflow: hidden;
+  text-overflow:ellipsis;
+  white-space: nowrap;
 }
 .box-card .bottom{
   padding-top: 10px;
@@ -318,6 +533,7 @@ export default {
   margin-bottom: 10px;
   border-bottom: 1px solid #eee;
   padding-bottom: 10px;
+  cursor: pointer;
 }
 .data-card.info .item .desc{
   font-size: 12px;
@@ -348,10 +564,15 @@ export default {
     box-shadow: 0 1px 30px rgb(243, 68, 68);
   }
 }
+@keyframes mymove
+{
+from {top:0px;}
+to {top:-68px;}
+}
 </style>
 <style lang="scss">
 .box-card .el-card__body{
-  padding: 20px 20px 10px 20px;
+  padding: 20px 10px 10px 10px;
 }
 .box-card .el-card__header{
   padding: 0;
@@ -359,9 +580,14 @@ export default {
 .data-card .el-card__header{
   padding: 20px 20px 10px;
   border-bottom: none;
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 2%;
 }
 .data-card .el-card__body{
-  padding: 0px 20px 20px 20px;
+  padding: 0;
+  margin: 10px 20px 20px 20px;
+  height: calc(100% - 83px);
 }
 .obicon{
   font-size: 14px;

@@ -22,6 +22,18 @@ const NurseAPI = {
       url: '/nurse/create',
       params: {id}
     })
+  },
+  getSsoList (id) {
+    return request.post({
+      url: '/message/sso/list',
+      params: {id}
+    })
+  },
+  updateTask (id) {
+    return request.post('/nursinghome/css/nurse/calltask/update', {callTaskId: id})
+  },
+  getCalltask (id) {
+    return request.get('/nursinghome/css/nurse/calltask/list')
   }
 }
 export default NurseAPI

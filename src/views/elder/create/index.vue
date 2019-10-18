@@ -282,21 +282,21 @@ export default {
   methods: {
     getNationList () {
       SystemAPI.getNactionList().then(res => {
-        if (res.code === 0) {
+        if (res && res.code === 0) {
           this.nationList = res.data.records
         }
       })
     },
     getBloodTypeList () {
       SystemAPI.getBloodTypeList().then(res => {
-        if (res.code === 0) {
+        if (res && res.code === 0) {
           this.bloodTypeList = res.data.records
         }
       })
     },
     getMedicalList () {
       SystemAPI.getMedicalList().then(res => {
-        if (res.code === 0) {
+        if (res && res.code === 0) {
           this.medicalList = res.data.records
         }
       })
