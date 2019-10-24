@@ -34,6 +34,9 @@ const NurseAPI = {
   },
   getCalltask (id) {
     return request.get('/nursinghome/css/nurse/calltask/list')
+  },
+  sendVist (elderId) {
+    return request.post('/nursinghome/css/nurse/vist', {elderId})
   }
 }
 export default NurseAPI

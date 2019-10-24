@@ -93,14 +93,29 @@
           </div>
         </el-card>
       </div>
-    </section>
+    </section><el-dialog
+      title="提示"
+      :visible.sync="dealDialog"
+      width="20%"
+      center>
+      <div style="text-align:center;">
+        <p>是否完成任务：{{visitInfo.elderName}}：{{visitInfo.callTaskName}}</p>
+        <br>
+        <el-button type="info" size="mini" @click="sendVisit">申请上门</el-button>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dealDialog = false">取 消</el-button>
+        <el-button type="primary" @click="overcomeMessage">确 定</el-button>
+      </span>
+    </el-dialog>
   </section>
 </template>
 
 <script>
 import HouseAPI from '@/api/house'
-import IScroll from 'iscroll'
 import NurseAPI from '@/api/nurse'
+// import DeviceAPI from '@/api/device'
+import IScroll from 'iscroll'
 import Config from '@/common/config'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
@@ -186,7 +201,9 @@ export default {
         'execTime': '2019-10-17 13:24:44'
       }],
       myScroll: null,
-      myScroll2: null
+      myScroll2: null,
+      dealDialog: false,
+      visitInfo: {}
     }
   },
   filters: {
@@ -256,6 +273,11 @@ export default {
       HouseAPI.getHouseElderList({houseId: 18}).then(res => {
         if (res.code === 0) {
           this.elderList = res.data.records
+          // DeviceAPI.getBloodPressureList({serialId:}).then(resp => {
+          //   if (resp.code === 0) {
+          //     this.deviceList = resp.data.records
+          //   }
+          // })
         }
       })
     },
@@ -388,20 +410,27 @@ export default {
       })
     },
     dealMessage (item) {
-      this.$confirm(`是否完成任务 ( ${item.elderName}：${item.callTaskName} )`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        NurseAPI.updateTask(item.callTaskId).then(resp => {
-          this.$store.dispatch('setHouseAlarmMessage', this.houseMessage.filter(ele => ele !== item))
-          this.$message.success(`任务 ( ${item.elderName}：${item.callTaskName} ),已确认`)
-        }).catch(err => {
-          this.$message.error(`确认失败：${err.message}`)
-        })
+      this.visitInfo = item
+      this.dealDialog = true
+    },
+    sendVisit () {
+      NurseAPI.sendVist(this.visitInfo.elderId).then(resp => {
+        if (resp.code === 0) {
+          this.$message.success(`发送申请成功`)
+        } else {
+          this.$message.error(`发送申请失败：${resp.msg}`)
+        }
       }).catch(err => {
-        console.log(err)
-        console.log('cancel')
+        this.$message.error(`发送申请失败：${err.message}`)
+      })
+    },
+    overcomeMessage () {
+      NurseAPI.updateTask(this.visitInfo.callTaskId).then(resp => {
+        this.$store.dispatch('setHouseAlarmMessage', this.houseMessage.filter(ele => ele !== this.visitInfo))
+        this.$message.success(`任务 ( ${this.visitInfo.elderName}：${this.visitInfo.callTaskName} ),已确认`)
+        this.dealDialog = false
+      }).catch(err => {
+        this.$message.error(`确认失败：${err.message}`)
       })
     }
   },

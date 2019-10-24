@@ -11,6 +11,9 @@ import request from '@/common/fetch'
 const DeviceAPI = {
   getDeviceList (params = {}) {
     return request.get('device/list', {...params})
+  },
+  getBloodPressureList (params = {}) {
+    return request.get('/nursinghome/css/watch/bloodPressure', {...params})
   }
 }
 export default DeviceAPI
