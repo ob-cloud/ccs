@@ -6,24 +6,41 @@
           <el-row type="flex" class="row-bg box_title" justify="center">
             <p class="box_title-left">
               <i class="el-icon-tickets text-number"></i>
-              组织数：<span class="text-number">555</span>
+              组织数：<span class="text-number">5</span>
               <br>
               <i class="el-icon-news text-number"></i>
-              员工数：<span class="text-number">231</span>
+              员工数：<span class="text-number">31</span>
             </p>
              <p class="box_title-center">
-              工单总数：<span class="text-number">3021546</span><sub> 个</sub>
+              工单总数：<span class="text-number">21546</span><sub> 个</sub>
               <br>
-              床位总数：<span class="text-number">3251</span> <sub> 个</sub>
+              床位总数：<span class="text-number">251</span> <sub> 个</sub>
             </p>
             <p  class="box_title-right">
               服务总时间：<span class="text-number">9542.21</span> <sub> 小时</sub>
               <br>
-              一周工单数：<span class="text-number">1321</span> <sub> 个</sub>
+              一周工单数：<span class="text-number">321</span> <sub> 个</sub>
             </p>
           </el-row>
           <div class="box-content" v-if="elderList.length">
-            <el-card class="box-card" v-for="(item, idx) in elderList" :key="idx" :class="{'breath-mode': records.bedId === item.bedId}">
+            <p class="type-title">养老院老人</p>
+            <el-card class="box-card" v-for="(item, idx) in elderList.filter(ele => ele.type !== 1)" :key="idx" :class="{'breath-mode': records.bedId === item.bedId}">
+              <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
+                <span>{{item.deviceStatus}}</span>
+              </div>
+              <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
+                {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
+              </div>
+              <div class="bottom clearfix">
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure | deviceDataFilter}}</el-button>
+              </div>
+              <div class="bottom clearfix">
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+              </div>
+            </el-card>
+            <p class="type-title">居家老人</p>
+            <el-card class="box-card" v-for="(item, idx) in elderList.filter(ele => ele.type === 1)" :key="idx + '-1'" :class="{'breath-mode': records.bedId === item.bedId}">
               <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
                 <span>{{item.deviceStatus}}</span>
               </div>
@@ -259,15 +276,15 @@ export default {
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
     },
     initWebSocket () {
-      const that = this
+      // const that = this
       this.connection()
-      this.timer = setInterval(() => {
-        try {
-          that.stompClient.send('test')
-        } catch (err) {
-          that.connection()
-        }
-      }, 3600000)
+      // this.timer = setInterval(() => {
+      //   try {
+      //     that.stompClient.send('test')
+      //   } catch (err) {
+      //     that.connection()
+      //   }
+      // }, 3600000)
     },
     connection () {
       const that = this
@@ -280,7 +297,7 @@ export default {
             this.stompClient.subscribe(
               `/user/pushmsg/remindByAli`,
               response => {
-                console.log('----- ', response)
+                console.log(new Date(), response)
                 try {
                   const record = JSON.parse(response.body)
                   if (record.type === 1) {
@@ -309,7 +326,8 @@ export default {
             )
           },
           err => {
-            console.log(err)
+            console.log('连接断开', err)
+            this.connection()
           }
         )
       } catch (error) {
@@ -389,8 +407,7 @@ export default {
   },
   beforeDestroy () {
     this.disconnect()
-    clearInterval(this.timer)
-    clearInterval(this.ticket)
+    clearInterval(this.ticket._id)
     clearTimeout(this.scrollTime)
     clearTimeout(this.scrollTime2)
   }
@@ -568,6 +585,12 @@ $ob-blue: rgb(0, 91, 172);
 {
 from {top:0px;}
 to {top:-68px;}
+}
+.type-title {
+  color: #fff;
+  font-size: 24px;
+  text-indent: 1em;
+  margin-bottom: 20px;
 }
 </style>
 <style lang="scss">

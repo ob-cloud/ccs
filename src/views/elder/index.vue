@@ -17,7 +17,6 @@
     </el-row>
     <base-table
       :row-class-name="tableRowClassName"
-      :height="tableHeight"
       :tableData="tableData"
       :columns="columns"
       border
@@ -383,7 +382,7 @@ export default {
         align: 'center',
         // width: '90px',
         formatter (val) {
-          return val === 1 ? '无欠费' : '欠费' + val
+          return val === 1 ? '无欠费' : '欠费'
         }
       }, {
         label: '住址',
@@ -577,145 +576,69 @@ export default {
     },
     drawelder () {
       const myChart = echarts.init(this.$refs.main)
-      const myColor = [
-        '#eb2100',
-        '#eb3600',
-        '#d0570e',
-        '#d0a00e',
-        '#34da62',
-        '#00e9db',
-        '#00c0e9',
-        '#0096f3',
-        '#33CCFF',
-        '#33FFCC'
-      ]
       const option = {
-        backgroundColor: '#0e2147',
+        title: [{
+          text: '年龄分布',
+          x: '25%',
+          textAlign: 'center'
+        }, {
+          text: '男女比例',
+          x: '75%',
+          y: '20%',
+          textAlign: 'center'
+        }],
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'shadow'
+          }
+        },
         grid: {
-          left: '5%',
+          left: '3%',
+          right: '50%',
+          bottom: '3%',
           top: '15%',
-          right: '5%',
-          bottom: '5%',
           containLabel: true
         },
         xAxis: [
           {
-            show: false
+            type: 'category',
+            data: ['50岁以下', '50-60岁', '60-70岁', '70-80岁', '70岁以上'],
+            axisTick: {
+              alignWithLabel: true
+            }
           }
         ],
         yAxis: [
           {
-            axisTick: 'none',
-            axisLine: 'none',
-            offset: '27',
-            axisLabel: {
-              textStyle: {
-                color: '#ffffff',
-                fontSize: '16',
-              }
-            },
-            data: ['40-45岁', '45-50岁', '50-55岁', '55-60岁', '60-65岁', '70-75岁', '75岁以上']
-          },
-          {
-            axisTick: 'none',
-            axisLine: 'none',
-            axisLabel: {
-              textStyle: {
-                color: '#ffffff',
-                fontSize: '16'
-              }
-            },
-            data: ['人', '人', '人', '人', '人', '人', '人']
-          },
-          {
-            name: '年龄分布',
-            nameGap: '20',
-            nameTextStyle: {
-              color: '#ffffff',
-              fontSize: '16'
-            },
-            axisLine: {
-              lineStyle: {
-                color: 'rgba(0,0,0,0)'
-              }
-            },
-            data: []
+            type: 'value'
           }
         ],
         series: [
           {
-            name: '条',
             type: 'bar',
-            yAxisIndex: 0,
-            data: [4, 13, 25, 29, 38, 44, 50],
+            barWidth: '60%',
+            data: [10, 52, 20, 23, 32, 31, 22]
+          },
+          {
+            name: '访问来源',
+            type: 'pie',
+            radius: '40%',
+            center: ['75%', '50%'],
+            data: [
+              {value: 51, name: '男性'},
+              {value: 20, name: '女性'}
+            ],
             label: {
-              normal: {
-                show: true,
-                position: 'right',
-                textStyle: {
-                  color: '#ffffff',
-                  fontSize: '16'
-                }
-              }
+              formatter: '{b}: {@2012} ({d}%)'
             },
-            barWidth: 12,
             itemStyle: {
-              normal: {
-                color: function (params) {
-                  return myColor[params.dataIndex % myColor.length]
-                }
+              emphasis: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
               }
-            },
-            z: 2
-          },
-          {
-            name: '白框',
-            type: 'bar',
-            yAxisIndex: 1,
-            barGap: '-100%',
-            data: [99.5, 99.5, 99.5, 99.5, 99.5, 99.5, 99.5],
-            barWidth: 20,
-            itemStyle: {
-              normal: {
-                color: '#0e2147',
-                barBorderRadius: 5
-              }
-            },
-            z: 1
-          },
-          {
-            name: '外框',
-            type: 'bar',
-            yAxisIndex: 2,
-            barGap: '-100%',
-            data: [100, 100, 100, 100, 100, 100, 100],
-            barWidth: 24,
-            itemStyle: {
-              normal: {
-                color: function (params) {
-                  return myColor[params.dataIndex % myColor.length]
-                },
-                barBorderRadius: 5
-              }
-            },
-            z: 0
-          },
-          {
-            name: '外圆',
-            type: 'scatter',
-            hoverAnimation: false,
-            data: [0, 0, 0, 0, 0, 0, 0],
-            yAxisIndex: 2,
-            symbolSize: 35,
-            itemStyle: {
-              normal: {
-                color: function (params) {
-                  return myColor[params.dataIndex % myColor.length]
-                },
-                opacity: 1
-              }
-            },
-            z: 2
+            }
           }
         ]
       }
@@ -737,7 +660,7 @@ export default {
 }
 .echart_height {
   height: 500px;
-  background-color: skyblue;
+  background-color: #fff;
 }
 .bm-view {
   width: 100%;

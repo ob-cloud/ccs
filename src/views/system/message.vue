@@ -10,7 +10,9 @@
           border
           v-loading="tableLoading"
           :pageTotal="total"
+          :showPagination="false"
           :pageSize="search.pageSize"
+          @row-click="dealMessage"
           @on-current-page-change="onCurrentChange"
           @on-page-size-change="onSizeChange">
         </base-table>
@@ -186,6 +188,24 @@ export default {
     },
     tableRowClassName ({row, rowIndex}) {
       return row.completeTime ? 'color-green' : 'color-red'
+    },
+    dealMessage (item, column, event) {
+      if (item.completeTime) return
+      this.$confirm(`是否完成任务 ( ${item.elderName}：${item.callTaskName} )`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        NurseAPI.updateTask(item.callTaskId).then(resp => {
+          this.$message.success(`任务 ( ${item.elderName}：${item.callTaskName} ),已确认`)
+          this.getCalltask()
+        }).catch(err => {
+          this.$message.error(`确认失败：${err.message}`)
+        })
+      }).catch(err => {
+        console.log(err)
+        console.log('cancel')
+      })
     }
   }
 }
