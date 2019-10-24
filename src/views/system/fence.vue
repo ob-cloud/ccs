@@ -37,6 +37,7 @@
           </bm-marker>
           <bm-circle :center="{lng: item.lng, lat: item.lat}" :radius="item.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-circle>
           <bm-local-search :panel="false" :keyword="keyword" :auto-viewport="true"></bm-local-search>
+          <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
         </div>
       </baidu-map>
     </div>
@@ -90,6 +91,7 @@ import BmMarker from 'vue-baidu-map/components/overlays/Marker.vue'
 import BmLabel from 'vue-baidu-map/components/overlays/Label.vue'
 import BmCircle from 'vue-baidu-map/components/overlays/Circle.vue'
 import BmLocalSearch from 'vue-baidu-map/components/search/LocalSearch.vue'
+import BmGeolocation from 'vue-baidu-map/components/controls/Geolocation.vue'
 
 // import FenceAPI from '@/api/fence'
 import BaseTable from '@/assets/package/table-base'
@@ -159,7 +161,7 @@ export default {
       this.activeFence.radius = val
     }
   },
-  components: {BaseTable, BaiduMap, BmNavigation, BmControl, BmMarker, BmCircle, BmLabel, BmLocalSearch},
+  components: {BaseTable, BaiduMap, BmNavigation, BmControl, BmMarker, BmCircle, BmLabel, BmLocalSearch, BmGeolocation},
   created () {
     this.columns = this.getColumns()
     this.getFenceList()
