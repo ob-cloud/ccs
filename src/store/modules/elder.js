@@ -123,7 +123,7 @@ const user = {
           })
         }
       })
-      DeviceAPI.getWatchHeartRates({serialId: deviceList.join(',')})
+      DeviceAPI.getWatchHeartRates({serialId: deviceList.join(',')}).catch(err => {})
     },
     getWatchBloodPressure ({ dispatch, commit, state }, message) {
       const deviceList = []
@@ -134,7 +134,7 @@ const user = {
           })
         }
       })
-      DeviceAPI.getWatchBloodPressure({serialId: deviceList.join(',')})
+      DeviceAPI.getWatchBloodPressure({serialId: deviceList.join(',')}).catch(err => {})
     },
     getWatchLocation ({ dispatch, commit, state }, message) {
       const deviceList = []
@@ -145,7 +145,7 @@ const user = {
           })
         }
       })
-      DeviceAPI.getWatchLocation({serialId: deviceList.join(',')})
+      DeviceAPI.getWatchLocation({serialId: deviceList.join(',')}).catch(err => {})
     }
   }
 }

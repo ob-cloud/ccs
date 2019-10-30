@@ -24,7 +24,7 @@ service.interceptors.request.use(config => {
   config.params.access_token = Storage.getToken()
   return config
 }, error => {
-  Promise.reject(error)
+  return Promise.reject(error)
 })
 
 service.interceptors.response.use(({data}) => {
