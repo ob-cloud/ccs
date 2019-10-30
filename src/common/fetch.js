@@ -35,7 +35,7 @@ service.interceptors.response.use(({data}) => {
   return data
 }, error => {
   // TODO alert exception
-  Promise.reject(error)
+  return Promise.reject(error)
 })
 
 const _defaults = (method, url, params, headers, type, configOption = {}) => {

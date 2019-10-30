@@ -10,6 +10,7 @@ import Vuex from 'vuex'
 import user from './modules/user'
 import menu from './modules/menu'
 import message from './modules/message'
+import elder from './modules/elder'
 import getters from './getters'
 import actions from './actions'
 import mutations from './mutations'
@@ -29,7 +30,8 @@ const store = new Vuex.Store({
   modules: {
     user,
     menu,
-    message
+    message,
+    elder,
   },
   state,
   getters,

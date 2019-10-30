@@ -26,7 +26,12 @@ router.beforeEach((to, from, next) => {
   if (Storage.getToken()) {
     store.dispatch('generateNavibarMenu')
     store.dispatch('setHouseList')
-    to.path === '/login' ? next({ path: '/' }) : next()
+    if (to.path === '/login') {
+      next({ path: '/' })
+    } else {
+      if (!store.state.elder.stompClient) store.dispatch('setelderList')
+      next()
+    }
   } else {
     to.path.includes('/login') ? next() : next({ path: '/login' })
     NProgress.done()

@@ -9,6 +9,8 @@ export default {
   token: state => state.user.token,
   uid: state => state.user.token,
   avatar: state => state.user.avatar,
+  elderList: state => state.elder.elderList,
+  serialInfo: state => state.elder.serialInfo,
   name: state => state.user.name,
   pwd: state => state.user.pwd,
   introduction: state => state.user.introduction,

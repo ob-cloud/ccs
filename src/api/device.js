@@ -12,8 +12,14 @@ const DeviceAPI = {
   getDeviceList (params = {}) {
     return request.get('device/list', {...params})
   },
-  getBloodPressureList (params = {}) {
+  getWatchHeartRates (params = {}) {
+    return request.get('/nursinghome/css/watch/heartRates', {...params})
+  },
+  getWatchBloodPressure (params = {}) {
     return request.get('/nursinghome/css/watch/bloodPressure', {...params})
+  },
+  getWatchLocation (params = {}) {
+    return request.get('/nursinghome/css/watch/location', {...params})
   }
 }
 export default DeviceAPI

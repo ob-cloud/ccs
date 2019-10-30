@@ -32,11 +32,11 @@
                 {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
-                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
               </div>
             </el-card>
             <p class="type-title">居家老人</p>
@@ -48,11 +48,11 @@
                 {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
-                <el-button type="text" icon="obicon obicon-xieya" style="float:right;" title="血压">{{item.bloodPressure | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i>{{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
               </div>
               <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="心率">{{item.heartRate | deviceDataFilter}}</el-button>
+                <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
               </div>
             </el-card>
           </div>
@@ -67,7 +67,7 @@
             <span>今日服务数据</span>
           </div>
           <div class="list-parent" id="wrapper" ref="listParent">
-            <div class="list" ref="list">
+            <div class="list scroll-test" ref="list2" v-bind:class="{ 'open-scroll' : openSroll2}">
               <div class="item" v-for="(item, index) in todayServerList" :key="index" >
                 <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
                 <span class="time">&nbsp;{{item.execTime}}</span>
@@ -112,9 +112,9 @@
 </template>
 
 <script>
-import HouseAPI from '@/api/house'
-import NurseAPI from '@/api/nurse'
+// import HouseAPI from '@/api/house'
 // import DeviceAPI from '@/api/device'
+import NurseAPI from '@/api/nurse'
 import IScroll from 'iscroll'
 import Config from '@/common/config'
 import SockJS from 'sockjs-client'
@@ -125,7 +125,7 @@ import { setInterval } from 'timers'
 export default {
   data () {
     return {
-      elderList: [],
+      // elderList: [],
       defaultProps: {
         children: 'children',
         label: 'label'
@@ -136,69 +136,91 @@ export default {
       scrollTime: null,
       scrollTime2: null,
       openSroll: false,
+      openSroll2: false,
       todayServerList: [{
         'id': 1,
         'roomNo': 'B102',
         'elderName': '刘秋菊',
         'bedNo': 'B3',
         'callTaskName': '测量血压体温并记录',
-        'execTime': '2019-10-17 10:24:44'
+        'execTime': '2019-10-30 09:24:23'
       }, {
         'id': 2,
         'roomNo': 'B103',
         'elderName': '黄观勤',
         'bedNo': 'B1',
         'callTaskName': '喂老人吃饭吃药',
-        'execTime': '2019-10-17 11:24:44'
+        'execTime': '2019-10-30 10:24:44'
       }, {
         'id': 3,
         'roomNo': 'B104',
-        'elderName': '朱美婵',
+        'elderName': '张辟妹',
         'bedNo': 'B1',
         'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'execTime': '2019-10-30 10:30:23'
       }, {
         'id': 4,
         'roomNo': 'B104',
         'elderName': '朱美婵',
         'bedNo': 'B1',
         'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'execTime': '2019-10-30 11:20:44'
       }, {
         'id': 5,
         'roomNo': 'B104',
         'elderName': '朱美婵',
         'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'callTaskName': '吃药',
+        'execTime': '2019-10-30 12:21:23'
       }, {
         'id': 6,
         'roomNo': 'B104',
-        'elderName': '朱美婵',
+        'elderName': '王伟',
         'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'callTaskName': '测量血压体温并记录',
+        'execTime': '2019-10-30 12:50:44'
       }, {
         'id': 7,
         'roomNo': 'B104',
-        'elderName': '朱美婵',
+        'elderName': '王伟',
         'bedNo': 'B1',
         'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'execTime': '2019-10-30 13:10:23'
       }, {
         'id': 8,
         'roomNo': 'B104',
         'elderName': '朱美婵',
         'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'callTaskName': '看电视',
+        'execTime': '2019-10-30 13:21:44'
       }, {
         'id': 9,
         'roomNo': 'B104',
+        'elderName': '张敏',
+        'bedNo': 'B1',
+        'callTaskName': '阅读',
+        'execTime': '2019-10-30 13:54:23'
+      }, {
+        'id': 10,
+        'roomNo': 'B104',
+        'elderName': '王伟',
+        'bedNo': 'B1',
+        'callTaskName': '户外活动',
+        'execTime': '2019-10-30 15:24:44'
+      }, {
+        'id': 11,
+        'roomNo': 'B104',
         'elderName': '朱美婵',
         'bedNo': 'B1',
+        'callTaskName': '喂老人吃饭吃药',
+        'execTime': '2019-10-30 17:24:23'
+      }, {
+        'id': 12,
+        'roomNo': 'B204',
+        'elderName': '张敏',
+        'bedNo': 'B3',
         'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-17 13:24:44'
+        'execTime': '2019-10-30 19:24:44'
       }],
       myScroll: null,
       myScroll2: null,
@@ -229,22 +251,24 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'houseMessage'
+      'houseMessage',
+      'serialInfo',
+      'elderList'
     ])
   },
   mounted () {
     this.fixLayout()
-    this.getElderList()
     this.initWebSocket()
     Helper.windowOnResize(this, this.fixLayout)
     this.ticket = setInterval(() => {
       this.getElderList()
     }, 10000)
     this.$nextTick(() => {
-      // this.ifScroll();
-      this.myScroll = new IScroll('#wrapper', {
-        snap: true
-      })
+      this.ifScroll()
+      // this.myScroll = new IScroll('#wrapper', {
+      //   snap: true
+      // })
+      this.ifScroll2()
     })
   },
   watch: {
@@ -270,15 +294,8 @@ export default {
       this.boxContainerHeight = Helper.calculateTableHeight() + 80
     },
     getElderList () {
-      HouseAPI.getHouseElderList({houseId: 18}).then(res => {
-        if (res.code === 0) {
-          this.elderList = res.data.records
-          // DeviceAPI.getBloodPressureList({serialId:}).then(resp => {
-          //   if (resp.code === 0) {
-          //     this.deviceList = resp.data.records
-          //   }
-          // })
-        }
+      this.$store.dispatch('setelderList').then(res => {
+        this.getSerialInfo()
       })
     },
     handleNodeClick (e) {
@@ -298,15 +315,14 @@ export default {
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
     },
     initWebSocket () {
-      // const that = this
       this.connection()
-      // this.timer = setInterval(() => {
-      //   try {
-      //     that.stompClient.send('test')
-      //   } catch (err) {
-      //     that.connection()
-      //   }
-      // }, 3600000)
+      this.timer = setInterval(() => {
+        try {
+          this.stompClient.send('test')
+        } catch (err) {
+          this.connection()
+        }
+      }, 3600000)
     },
     connection () {
       const that = this
@@ -409,6 +425,19 @@ export default {
         snap: true
       })
     },
+    ifScroll2 () {
+      // 开启滚动定时器
+      setTimeout(() => {
+        this.openSroll2 = true
+        setTimeout(() => {
+          this.openSroll2 = false
+          this.todayServerList.push(this.todayServerList.shift())
+          setTimeout(() => {
+            this.ifScroll2()
+          }, 6000)
+        }, 2000)
+      }, 4000)
+    },
     dealMessage (item) {
       this.visitInfo = item
       this.dealDialog = true
@@ -432,11 +461,24 @@ export default {
       }).catch(err => {
         this.$message.error(`确认失败：${err.message}`)
       })
+    },
+    getSerialInfo () {
+      this.$store.dispatch('getWatchHeartRates')
+      this.$store.dispatch('getWatchBloodPressure')
+    },
+    getbedInfo (list, type = 'heartRate') {
+      if (list && list.length && Object.keys(this.serialInfo).length) {
+        for (let index = 0; index < list.length; index++) {
+          if (this.serialInfo[list[index].serialId]) return this.serialInfo[list[index].serialId][type]
+        }
+      }
+      return '-'
     }
   },
   beforeDestroy () {
     this.disconnect()
     clearInterval(this.ticket._id)
+    clearInterval(this.timer._id)
     clearTimeout(this.scrollTime)
     clearTimeout(this.scrollTime2)
   }
@@ -487,7 +529,7 @@ $ob-blue: rgb(0, 91, 172);
       .text-number {
         color:#fff;
       }
-      color: $ob-blue;
+      color: #fff;
     }
     .box_title-center {
       padding: 0 60px;
@@ -624,7 +666,7 @@ to {top:-68px;}
 </style>
 <style lang="scss">
 .box-card .el-card__body{
-  padding: 20px 10px 10px 10px;
+  padding: 20px 10px 10px;
 }
 .box-card .el-card__header{
   padding: 0;
@@ -643,6 +685,5 @@ to {top:-68px;}
 }
 .obicon{
   font-size: 14px;
-  margin-right: 3px;
 }
 </style>
