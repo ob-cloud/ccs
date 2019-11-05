@@ -11,6 +11,15 @@ import request from '@/common/fetch'
 const FenceAPI = {
   getFenceList () {
     return request.get('fence/list')
+  },
+  getLocationList (params) {
+    return request.get('nursinghome/ccs/nurse/LocationList')
+  },
+  SetLocation (params) {
+    return request.post('nursinghome/ccs/nurse/setLocation', params)
+  },
+  deleteLocation (params) {
+    return request.post('nursinghome/ccs/nurse/deleteLocation', params)
   }
 }
 export default FenceAPI

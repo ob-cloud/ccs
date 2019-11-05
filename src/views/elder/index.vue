@@ -5,13 +5,15 @@
         <div id="main" ref="main" style="width: 100%;height:500px;"></div>
       </el-col>
       <el-col :span="12">
-        <baidu-map class="bm-view" ak="3779aed6a37117a6b4a0b0dcb3e20b8d" :center="center" :zoom="16" :scroll-wheel-zoom="false">
+        <baidu-map class="bm-view" ak="3779aed6a37117a6b4a0b0dcb3e20b8d" :center="center" :zoom="15" :scroll-wheel-zoom="true">
           <bm-navigation anchor="BMAP_ANCHOR_TOP_LEFT"></bm-navigation>
+          <!-- tableDataEchart showPolygonPath-->
           <div v-for="item in tableDataEchart" :key="item.id">
             <bm-marker :position="{lng: item.lng, lat: item.lat}" :dragging="false" >
             </bm-marker>
-            <bm-polygon :path="polygonPath" stroke-color="blue" :stroke-opacity="0.1" :stroke-weight="2" fillColor="#fff"  :fillOpacity="0.12" @lineupdate="updatePolygonPath"/>
           </div>
+          <bm-polygon :path="polygonPath" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2" fillColor="#fff"  :fillOpacity="0.12" @lineupdate="updatePolygonPath"/>
+          <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
         </baidu-map>
       </el-col>
     </el-row>
@@ -122,7 +124,13 @@
 import BaseTable from '@/assets/package/table-base'
 import ElderAPI from '@/api/elder'
 import RoomAPI from '@/api/room'
-import echarts from 'echarts'
+// import echarts from 'echarts'
+
+const echarts = require('echarts/lib/echarts')
+require('echarts/lib/chart/bar')
+require('echarts/lib/chart/pie')
+require('echarts/lib/component/tooltip')
+require('echarts/lib/component/title')
 import elderCreate from './create/index'
 import { PAGINATION_PAGENO, PAGINATION_PAGESIZE } from '@/common/constants'
 import Helper from '@/common/helper'
@@ -130,6 +138,8 @@ import BaiduMap from 'vue-baidu-map/components/map/Map.vue'
 import BmNavigation from 'vue-baidu-map/components/controls/Navigation.vue'
 import BmMarker from 'vue-baidu-map/components/overlays/Marker.vue'
 import BmPolygon from 'vue-baidu-map/components/overlays/Polygon.vue'
+import BmGeolocation from 'vue-baidu-map/components/controls/Geolocation.vue'
+import { mapGetters } from 'vuex'
 export default {
   data () {
     return {
@@ -240,10 +250,20 @@ export default {
         { 'lng': 113.841136, 'lat': 23.389531 },
         { 'lng': 113.84207, 'lat': 23.387872 },
         { 'lng': 113.835782, 'lat': 23.378651 }
-      ]
+      ],
+      showPolygonPath: [],
+      elderEchartInfo: {
+        manNum: 0,
+        womenNum: 0,
+        fiftyNum: 0,
+        sixty: 0,
+        seventy: 0,
+        eighty: 0,
+        eightyMore: 0
+      }
     }
   },
-  components: {BaseTable, elderCreate, BaiduMap, BmNavigation, BmMarker, BmPolygon},
+  components: {BaseTable, elderCreate, BaiduMap, BmNavigation, BmMarker, BmPolygon, BmGeolocation},
   created () {
     this.columns = this.getColumns()
     this.getElderList()
@@ -277,6 +297,44 @@ export default {
   mounted () {
     Helper.windowOnResize(this, this.fixLayout)
     this.drawelder()
+    this.$store.dispatch('getWatchLocation').catch(err => {})
+  },
+  computed: {
+    ...mapGetters([
+      'elderList',
+      'serialInfo'
+    ])
+  },
+  watch: {
+    serialInfo: {
+      deep: true,
+      handler (val, oldVal) {
+        const tarObj = Object.keys(val)
+        const path = []
+        if (!tarObj.length) return
+        for (let index = 0; index < tarObj.length; index++) {
+          const tarObjItem = val[tarObj[index]]
+          if (tarObjItem.id && tarObjItem.lat && tarObjItem.lon) {
+            path.push({
+              ...tarObjItem,
+              'id': tarObjItem.id,
+              'lng': tarObjItem.lon,
+              'lat': tarObjItem.lat
+            })
+          }
+        }
+        this.showPolygonPath = path
+      }
+    },
+    elderList: {
+      deep: true,
+      handler  (val, oldVal) {
+        for (let index = 0; index < val.length; index++) {
+          // const element = val[index]
+          // 处理年龄分布以及男女比例（暂无）
+        }
+      }
+    }
   },
   methods: {
     fixLayout () {

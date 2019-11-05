@@ -10,7 +10,7 @@
           border
           v-loading="tableLoading"
           :pageTotal="total"
-          :showPagination="false"
+          :showPagination="true"
           :pageSize="search.pageSize"
           @row-click="dealMessage"
           @on-current-page-change="onCurrentChange"
@@ -161,11 +161,11 @@ export default {
     },
     onCurrentChange (pageNo) {
       this.search.pageNo = pageNo
-      this.getMessageList()
+      this.getCalltask()
     },
     onSizeChange (pageSize) {
       this.search.pageSize = pageSize
-      this.getMessageList()
+      this.getCalltask()
     },
     onTabClick () {
       this.tableLoading = true
@@ -175,11 +175,11 @@ export default {
     },
     getCalltask () {
       this.tableLoading = true
-      NurseAPI.getCalltask().then(resp => {
-        console.log(resp)
+      NurseAPI.getCalltask(this.search).then(resp => {
         this.tableLoading = false
         if (resp.code === 0 && resp.data && resp.data.records) {
           this.tableData = resp.data.records || []
+          this.total = resp.data.total
         }
       }).catch(err => {
         this.tableLoading = false

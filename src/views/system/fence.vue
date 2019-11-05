@@ -25,7 +25,10 @@
         <bm-navigation anchor="BMAP_ANCHOR_TOP_LEFT"></bm-navigation>
         <bm-control anchor="BMAP_ANCHOR_TOP_RIGHT">
           <div class="slider-container">
-            <span class="label fl mrg">范围</span>
+            <span class="label fl mrg">
+              <el-button v-if="circlePath.radius !== activeFence.radii" @click="updateArea" size="mini">更新</el-button>
+              <span v-else>范围</span>
+            </span>
             <span class="label fl">{{circlePath.radius}}</span>
             <span class="label fr">5km</span>
             <el-slider class="slider" v-model="circlePath.radius" :min="circlePath.min" :max="circlePath.max" :format-tooltip="formatTooltip"></el-slider>
@@ -36,9 +39,9 @@
             <bm-label :content="item.name" :labelStyle="{color: '#666', border: '1px solid #ccc', borderRadius: '4px', padding: '4px', background: '#fff', boxShadow: '1px 1px 3px #999', fontSize : '14px'}" :offset="{width: -65, height: 30}"/>
           </bm-marker>
           <bm-circle :center="{lng: item.lng, lat: item.lat}" :radius="item.radius" stroke-color="blue" :stroke-opacity="0.5" :stroke-weight="2"></bm-circle>
+        </div>
           <bm-local-search :panel="false" :keyword="keyword" :auto-viewport="true"></bm-local-search>
           <bm-geolocation anchor="BMAP_ANCHOR_BOTTOM_RIGHT" :showAddressBar="true" :autoLocation="true"></bm-geolocation>
-        </div>
       </baidu-map>
     </div>
     <el-dialog
@@ -74,10 +77,13 @@
         <el-form-item label="纬度">
           <el-input v-model="formBeadhouse.lat" placeholder="纬度"></el-input>
         </el-form-item>
+        <el-form-item label="范围">
+          <el-input v-model="formBeadhouse.radii" placeholder="范围"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="addBeadHouseDialog = false">取 消</el-button>
-        <el-button type="primary" @click="addCrawl" :disabled="!(formBeadhouse.name && formBeadhouse.lng && formBeadhouse.lat)">确 定</el-button>
+        <el-button type="primary" @click="addCrawl" :disabled="!(formBeadhouse.name && formBeadhouse.lng && formBeadhouse.lat && formBeadhouse.radii)">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -95,20 +101,10 @@ import BmGeolocation from 'vue-baidu-map/components/controls/Geolocation.vue'
 
 // import FenceAPI from '@/api/fence'
 import BaseTable from '@/assets/package/table-base'
-// import FenceAPI from '@/api/fence'
+import FenceAPI from '@/api/fence'
+import { mapGetters } from 'vuex'
 export default {
   data () {
-    const generateData = _ => {
-      const data = []
-      for (let i = 1; i <= 15; i++) {
-        data.push({
-          key: i,
-          label: `人员 ${i}`,
-          id: i + 1
-        })
-      }
-      return data
-    }
     return {
       activeTabName: 'fenceList',
       tableLoading: true,
@@ -131,11 +127,12 @@ export default {
       formBeadhouse: {
         name: '',
         lng: '',
-        lat: ''
+        lat: '',
+        radii: ''
       },
       setConsumerDialog: false, // 分配老人
       editbeadhouse: {},
-      consumerList: generateData(),
+      consumerList: null,
       headhousePeople: [],
       editBeadhouseLoad: false,
       keyword: '',
@@ -147,11 +144,12 @@ export default {
       }
     }
   },
-  // computed: {
-  //   activeFence () {
-
-  //   }
-  // },
+  computed: {
+    ...mapGetters([
+      'elderList',
+      'serialInfo'
+    ])
+  },
   watch: {
     activeAnchor (val) {
       const fence = this.tableData.find(item => this.activeAnchor === item.id)
@@ -165,6 +163,16 @@ export default {
   created () {
     this.columns = this.getColumns()
     this.getFenceList()
+    this.consumerList = this.elderList.map(ele => {
+      return {
+        ...ele,
+        'key': ele.bedId,
+        'label': ele.elderName,
+        'id': ele.bedId
+      }
+    })
+  },
+  mounted () {
   },
   methods: {
     updateCirclePath (e) {
@@ -176,55 +184,32 @@ export default {
     },
     getFenceList () {
       this.tableLoading = true
-      const fence = {
-        'data': {
-          'records': [
-            {
-              'id': 1,
-              'name': '增城小楼养老院',
-              'lng': '113.8385127760',
-              'lat': '23.3861140903',
-              'type': 1,
-              'radius': 200
-            },
-            {
-              'id': 2,
-              'name': 'XX小楼养老院',
-              'lng': '113.9385127760',
-              'lat': '23.3861140903',
-              'type': 1,
-              'radius': 300
+      FenceAPI.getLocationList(this.search).then(resp => {
+        if (resp.code === 0) {
+          this.tableData = resp.data.records.map(ele => {
+            return {
+              ...ele,
+              'id': ele.locationId,
+              'lng': ele.lon,
+              'radius': ele.radii
             }
-          ],
-          'total': 1
+          })
+          this.located(this.tableData[0])
+          this.tableLoading = false
+        } else {
+          this.$message({
+            message: resp.message || '列表获取失败'
+          })
         }
-      }
-      this.tableData = fence.data.records
-      // this.activeAnchor = this.tableData[0].id
-      this.tableLoading = false
-      this.tableData.length && this.located(this.tableData[0])
-      // FenceAPI.getFenceList(this.search).then(resp => {
-      //   if (resp.code === 0) {
-      //     this.tableData = resp.data.records
-      //     this.activeAnchor = this.tableData[0].id
-      //     // this.activeFence = this.tableData[0]
-      //     // this.activeAnchor = this.tableData[0].id
-      //     // this.center.lng = +this.tableData[0].lng
-      //     // this.center.lat = +this.tableData[0].lat
-      //   } else {
-      //     this.$message({
-      //       message: resp.message || '列表获取失败'
-      //     })
-      //   }
-      //   this.tableLoading = false
-      // }).catch(err => {
-      //   this.$message({
-      //     title: '失败',
-      //     message: err.message || '服务出错',
-      //     type: 'error'
-      //   })
-      //   this.tableLoading = false
-      // })
+        this.tableLoading = false
+      }).catch(err => {
+        this.$message({
+          title: '失败',
+          message: err.message || '服务出错',
+          type: 'error'
+        })
+        this.tableLoading = false
+      })
     },
     getColumns () {
       return [{
@@ -267,35 +252,60 @@ export default {
       this.formBeadhouse.name = ''
       this.formBeadhouse.lng = this.mapBtn.point.lng
       this.formBeadhouse.lat = this.mapBtn.point.lat
+      this.formBeadhouse.radii = 300
     },
     addCrawl () {
-      this.tableData.push(
-        {
-          'id': this.tableData.length + 1,
-          'name': this.formBeadhouse.name,
-          'lng': this.formBeadhouse.lng,
-          'lat': this.formBeadhouse.lat,
-          'radius': 300
+      FenceAPI.SetLocation({
+        lat: this.formBeadhouse.lat,
+        lon: this.formBeadhouse.lng,
+        name: this.formBeadhouse.name,
+        radii: this.formBeadhouse.radii * 1,
+      }).then(resp => {
+        console.log('resp', resp)
+        if (resp.code === 0) {
+          this.$message.success('添加成功')
+          this.addBeadHouseDialog = false
+          this.getFenceList()
         }
-      )
-      this.$message.success('添加成功')
-      this.addBeadHouseDialog = false
-      this.located(this.tableData[this.tableData.length - 1])
+      }).catch(err => {
+      })
     },
     remove (row) {
-      this.tableData = this.tableData.filter(ele => ele.id !== row.id)
-      if (row.id === this.activeAnchor && this.tableData.length) {
-        this.located(this.tableData[0])
-      }
+      FenceAPI.deleteLocation({locationId: row.locationId}).then(res => {
+        if (res.code === 0) {
+          this.$message.success('删除成功')
+          this.tableData = this.tableData.filter(ele => ele.id !== row.id)
+          if (row.id === this.activeAnchor && this.tableData.length) {
+            this.located(this.tableData[0])
+          }
+        }
+      }).catch(err => {
+        console.log('err', err)
+      })
     },
     setConsumer (row) {
       // 打开人员编辑页面
       this.setConsumerDialog = true
+      this.headhousePeople = row.elderList || []
       this.editbeadhouse = row
     },
     consumerListChange (value, direction, movedKeys) {
-      // this.editBeadhouseLoad = true
-      console.log(value, direction, movedKeys)
+      FenceAPI.SetLocation({
+        elderList: this.headhousePeople || [],
+        lat: this.editbeadhouse.lat,
+        lon: this.editbeadhouse.lng,
+        name: this.editbeadhouse.name,
+        radii: this.editbeadhouse.radii * 1,
+        locationId: this.editbeadhouse.locationId * 1,
+      }).then(resp => {
+        console.log('resp', resp)
+        if (resp.code === 0) {
+          this.$message.success('更新成功')
+          this.addBeadHouseDialog = false
+          this.getFenceList()
+        }
+      }).catch(err => {
+      })
       if (direction === 'left') {
         console.log('删除', movedKeys)
       } else {
@@ -303,11 +313,27 @@ export default {
       }
     },
     rightClick (type, target, point, pixel, overlay) {
-      console.log('type', type)
       this.mapBtn.show = true
       this.mapBtn.pageX = type.offsetX - 10
       this.mapBtn.pageY = type.offsetY + 30
       this.mapBtn.point = type.point
+    },
+    updateArea () {
+      FenceAPI.SetLocation({
+        elderList: this.activeFence.elderList || [],
+        lat: this.activeFence.lat,
+        lon: this.activeFence.lng,
+        name: this.activeFence.name,
+        radii: this.circlePath.radius * 1,
+        locationId: this.activeFence.locationId * 1,
+      }).then(resp => {
+        if (resp.code === 0) {
+          this.$message.success('更新成功')
+          this.addBeadHouseDialog = false
+          this.getFenceList()
+        }
+      }).catch(err => {
+      })
     }
   }
 }

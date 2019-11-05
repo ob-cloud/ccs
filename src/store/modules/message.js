@@ -33,6 +33,7 @@ const user = {
     setHouseAlarmMessage ({ commit, state }, message) {
       return new Promise(resolve => {
         commit('SET_HOUSE_MESSAGE', message)
+        console.log('message', message)
         resolve(message)
       })
     }

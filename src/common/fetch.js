@@ -35,6 +35,7 @@ service.interceptors.response.use(({data}) => {
   return data
 }, error => {
   // TODO alert exception
+  console.log('error', error)
   return Promise.reject(error)
 })
 

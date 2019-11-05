@@ -20,6 +20,9 @@ const DeviceAPI = {
   },
   getWatchLocation (params = {}) {
     return request.get('/nursinghome/css/watch/location', {...params})
+  },
+  bloodPressureHistory (params = {}) {
+    return request.get('/nursinghome/css/watch/bloodPressure/history', {...params})
   }
 }
 export default DeviceAPI

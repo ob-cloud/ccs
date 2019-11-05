@@ -28,15 +28,17 @@
               <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
                 <span>{{item.deviceStatus}}</span>
               </div>
-              <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
-                {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
-              </div>
-              <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
-              </div>
-              <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+              <div @click="showChart(item, '1', item.elderName)" class="handle-point">
+                <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
+                  {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
+                </div>
+                <div class="bottom clearfix">
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率" @click="showChart(item, '1', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
+                </div>
+                <div class="bottom clearfix">
+                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压" @click="showChart(item, '2', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+                </div>
               </div>
             </el-card>
             <p class="type-title">居家老人</p>
@@ -44,15 +46,17 @@
               <div slot="header" class="clearfix title" :style="{background: backgroundFilter(item.deviceStatus)}" :title="item.deviceStatus">
                 <span>{{item.deviceStatus}}</span>
               </div>
-              <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
-                {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
-              </div>
-              <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i>{{item.heartRate | deviceDataFilter}}</el-button>
-                <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
-              </div>
-              <div class="bottom clearfix">
-                <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+              <div @click="showChart(item, '1', item.elderName)" class="handle-point">
+                <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
+                  <el-button icon="el-icon-video-camera-solid" size="mini" circle title="实时监控" @click="showVedio(item)"></el-button> {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
+                </div>
+                <div class="bottom clearfix">
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i>{{item.heartRate | deviceDataFilter}}</el-button>
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率" @click="showChart(item, '1', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
+                </div>
+                <div class="bottom clearfix">
+                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压" @click="showChart(item, '2', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+                </div>
               </div>
             </el-card>
           </div>
@@ -83,7 +87,7 @@
             <div class="list" v-bind:class="{ 'open-scroll' : openSroll}" ref="list">
               <div class="item" v-for="(item, index) in houseMessage" :key="index" @click="dealMessage(item)">
                 <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
-                <span class="time">&nbsp;{{item.execTime}}</span>
+                <span class="time">&nbsp;{{item.execTime || item.time}}</span>
               </div>
               <!-- <div class="item" v-for="(item, index) in testList" :key="index + '-1'" @click="dealMessage(item)">
                 <p class="desc">{{item.text}}</p>
@@ -115,10 +119,7 @@
 // import HouseAPI from '@/api/house'
 // import DeviceAPI from '@/api/device'
 import NurseAPI from '@/api/nurse'
-import IScroll from 'iscroll'
-import Config from '@/common/config'
-import SockJS from 'sockjs-client'
-import Stomp from 'stompjs'
+// import IScroll from 'iscroll'
 import Helper from '@/common/helper'
 import { mapGetters } from 'vuex'
 import { setInterval } from 'timers'
@@ -258,11 +259,10 @@ export default {
   },
   mounted () {
     this.fixLayout()
-    this.initWebSocket()
     Helper.windowOnResize(this, this.fixLayout)
     this.ticket = setInterval(() => {
       this.getElderList()
-    }, 10000)
+    }, 20000)
     this.$nextTick(() => {
       this.ifScroll()
       // this.myScroll = new IScroll('#wrapper', {
@@ -272,20 +272,11 @@ export default {
     })
   },
   watch: {
-    records: {
-      deep: true,
-      handler (val) {
-        if (!val || (val && !Object.keys(val).length)) return
-        // let target = null
-        // if (val.deviceType === 'third') {
-        //   target = this.elderList.find(item => item.serialId === val.serialId)
-        // } else {
-        //   target = this.elderList.find(item => item.bedId === val.bedId)
-        // }
-        const target = this.elderList.find(item => item.bedId === val.bedId)
-        if (target) {
-          target.deviceStatus = val.deviceStatus
-        }
+    houseMessage (val, eldValue) {
+      if (val.length !== eldValue.length) {
+        this.$nextTick(() => {
+          this.ifScroll()
+        })
       }
     }
   },
@@ -296,7 +287,7 @@ export default {
     getElderList () {
       this.$store.dispatch('setelderList').then(res => {
         this.getSerialInfo()
-      })
+      }).catch(err => {})
     },
     handleNodeClick (e) {
       console.log(e)
@@ -313,69 +304,6 @@ export default {
         2: '#d0d0d0'
       }
       return preset === 1 ? statusMap[val] : deviceStatus[preset]
-    },
-    initWebSocket () {
-      this.connection()
-      this.timer = setInterval(() => {
-        try {
-          this.stompClient.send('test')
-        } catch (err) {
-          this.connection()
-        }
-      }, 3600000)
-    },
-    connection () {
-      const that = this
-      try {
-        const socket = new SockJS(Config.websocket.url)
-        this.stompClient = Stomp.over(socket)
-        this.stompClient.connect(
-          {},
-          frame => {
-            this.stompClient.subscribe(
-              `/user/pushmsg/remindByAli`,
-              response => {
-                console.log(new Date(), response)
-                try {
-                  const record = JSON.parse(response.body)
-                  if (record.type === 1) {
-                    const target = this.elderList.find(item => item.bedId === record.bedId) || {}
-                    clearTimeout(this.scrollTime)
-                    if (this.scrollTime2) {
-                      this.testList.splice(1, 0, {...target, ...record})
-                    } else {
-                      this.houseMessage.unshift({...target, ...record})
-                    }
-                    that.$store.dispatch('setHouseAlarmMessage', this.houseMessage)
-                    this.$nextTick(() => {
-                      this.ifScroll()
-                    })
-                  } else {
-                    that.records.bedId = -1
-                    setTimeout(() => {
-                      that.records = record || {}
-                    }, 0)
-                  }
-                } catch (error) {
-                  console.log('推送解析失败', error)
-                }
-              },
-              { ack: 'client-individual' }
-            )
-          },
-          err => {
-            console.log('连接断开', err)
-            this.connection()
-          }
-        )
-      } catch (error) {
-        console.log(error)
-      }
-    },
-    disconnect () {
-      if (this.stompClient) {
-        this.stompClient.disconnect()
-      }
     },
     backgroundFilter (val) {
       return {
@@ -408,22 +336,22 @@ export default {
     ifScroll () {
       const parentH = this.$refs.listParent.offsetHeight
       const listH = this.$refs.list.offsetHeight
+      this.scrollTime && clearTimeout(this.scrollTime)
+      this.scrollTime2 && clearTimeout(this.scrollTime2)
+      this.openSroll = false
       if (listH > parentH) {
         // 开启滚动定时器
         this.scrollTime = setTimeout(() => {
           this.openSroll = true
           this.scrollTime2 = setTimeout(() => {
             this.openSroll = false
-            // this.testList.push(this.testList.shift())
-            this.houseMessage.push(this.houseMessage.shift())
-            this.scrollTime2 = null
-            this.ifScroll()
+            this.$store.dispatch('setHouseAlarmMessage', [...this.houseMessage.slice(1), ...this.houseMessage.slice(0, 1)])
+            this.$nextTick(() => {
+              this.ifScroll()
+            })
           }, 2000)
-        }, 4000)
+        }, 10000)
       }
-      this.myScroll2 = new IScroll('#wrapper2', {
-        snap: true
-      })
     },
     ifScroll2 () {
       // 开启滚动定时器
@@ -463,8 +391,9 @@ export default {
       })
     },
     getSerialInfo () {
-      this.$store.dispatch('getWatchHeartRates')
-      this.$store.dispatch('getWatchBloodPressure')
+      this.$store.dispatch('getWatchHeartRates').then(res => {}).catch(err => {})
+      this.$store.dispatch('getWatchBloodPressure').then(res => {}).catch(err => {})
+      this.$store.dispatch('getWatchLocation').then(res => {}).catch(err => {})
     },
     getbedInfo (list, type = 'heartRate') {
       if (list && list.length && Object.keys(this.serialInfo).length) {
@@ -473,14 +402,31 @@ export default {
         }
       }
       return '-'
+    },
+    showChart (row, tab, elderName) {
+      const tarDevice = row.list.find(ele => ele.deviceType === 2)
+      if (tarDevice) {
+        this.$router.push({
+          path: '/dashboard/chart.html',
+          query: {
+            serialId: tarDevice.serialId,
+            tab,
+            elderName
+          }
+        })
+      } else {
+        this.$message.error('老人未绑定手表，请绑定之后再查询')
+      }
+    },
+    showVedio (item) {
+      this.$message.info('功能开发中')
     }
   },
   beforeDestroy () {
-    this.disconnect()
-    clearInterval(this.ticket._id)
-    clearInterval(this.timer._id)
-    clearTimeout(this.scrollTime)
-    clearTimeout(this.scrollTime2)
+    this.ticket && clearInterval(this.ticket._id)
+    this.timer && clearInterval(this.timer._id)
+    this.scrollTime && clearTimeout(this.scrollTime)
+    this.scrollTime2 && clearTimeout(this.scrollTime2)
   }
 }
 </script>
@@ -587,7 +533,6 @@ $ob-blue: rgb(0, 91, 172);
 .box-card .text{
   font-size: 14px;
   text-align: center;
-  padding-bottom: 10px;
   overflow: hidden;
   text-overflow:ellipsis;
   white-space: nowrap;
@@ -663,10 +608,13 @@ to {top:-68px;}
   text-indent: 1em;
   margin-bottom: 20px;
 }
+.handle-point {
+  cursor: pointer;
+}
 </style>
 <style lang="scss">
 .box-card .el-card__body{
-  padding: 20px 10px 10px;
+  padding: 15px 10px 10px;
 }
 .box-card .el-card__header{
   padding: 0;

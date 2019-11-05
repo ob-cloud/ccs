@@ -32,8 +32,8 @@ const NurseAPI = {
   updateTask (id) {
     return request.post('/nursinghome/css/nurse/calltask/update', {callTaskId: id})
   },
-  getCalltask (id) {
-    return request.get('/nursinghome/css/nurse/calltask/list')
+  getCalltask (params) {
+    return request.get('/nursinghome/css/nurse/calltask/list', params)
   },
   sendVist (elderId) {
     return request.post('/nursinghome/css/nurse/vist', {elderId})

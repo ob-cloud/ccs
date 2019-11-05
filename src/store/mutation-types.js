@@ -34,8 +34,7 @@ export const SET_MESSAGE_COUNT = 'SET_MESSAGE_COUNT' // 消息管理消息数
 
 // sock mutations
 export const SET_ELDER_LIST = 'SET_ELDER_LIST' // 设置老人列表
-export const OPEN_SOCKET = 'OPEN_SOCKET' // 设置老人列表
+export const OPEN_SOCKET = 'OPEN_SOCKET' // websock连接
 export const SET_SERIAL_INFO = 'SET_SERIAL_INFO' // 设置设备信息
-export const SET_BED_HEART_RATE = 'SET_BED_HEART_RATE' // 设置床心率
 export const SET_WATCH_HEART_RATE = 'SET_WATCH_HEART_RATE' // 设置手表心率
 export const SET_WATCH_BLOOD_PRESSURE = 'SET_WATCH_BLOOD_PRESSURE' // 设置手表血压

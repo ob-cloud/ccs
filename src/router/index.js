@@ -21,7 +21,7 @@ const router = new VueRouter({
   routes: menuRouters
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   NProgress.start()
   if (Storage.getToken()) {
     store.dispatch('generateNavibarMenu')
@@ -29,7 +29,7 @@ router.beforeEach((to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      if (!store.state.elder.stompClient) store.dispatch('setelderList')
+      if (!store.state.elder.stompClient) await store.dispatch('setelderList').then(res => { }).catch(async err => { await store.dispatch('setelderList') })
       next()
     }
   } else {
