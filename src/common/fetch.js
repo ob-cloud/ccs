@@ -28,7 +28,7 @@ service.interceptors.request.use(config => {
 })
 
 service.interceptors.response.use(({data}) => {
-  if (data.code === 1002) { // invalid token
+  if (data.code === 511 && data.msg === 'token过期') { // invalid token
     Storage.removeToken()
     Router.push({path: '/login'})
   }
