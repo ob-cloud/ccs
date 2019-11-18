@@ -50,7 +50,7 @@ const user = {
     setelderList ({ dispatch, commit, state }, message) {
       return new Promise(async (resolve, reject) => {
         if (!state.stompClient) {
-          await dispatch('connection')
+          await dispatch('connection').catch(err => {})
         }
         HouseAPI.getHouseElderList({houseId: 18}).then(res => {
           if (res.code === 0) {
@@ -91,6 +91,14 @@ const user = {
                         }
                         record.serialId && commit('SET_SERIAL_INFO', Object.assign({}, tarCord, state.serialInfo[record.serialId] || {}, record)) // 记录设备的心率，位置，血压
                         break
+                      // case 7:
+                      //   state.elderList.forEach(ele => {
+                      //     if (ele.bedId === record.bedId || ele.elderId === record.elderId) {
+                      //       tarCord = ele
+                      //     }
+                      //   })
+                      //   dispatch('setHouseAlarmMessage', getters.houseMessage.concat([Object.assign({}, record, tarCord)])) // 消息列表，开门推送+SSO申请
+                      //   break
                       default:
                         break
                     }
@@ -112,12 +120,13 @@ const user = {
                       case 1:
                       case 5:
                       case 6:
+                      case 7:
                         state.elderList.forEach(ele => {
-                          if (ele.bedId === record.bedId || ele.id === record.elderId) {
+                          if (ele.bedId === record.bedId || ele.elderId === record.elderId) {
                             tarCord = ele
                           }
                         })
-                        dispatch('setHouseAlarmMessage', getters.houseMessage.concat([Object.assign({}, record, tarCord)])) // 消息列表，开门推送+SSO申请
+                        dispatch('setHouseAlarmMessage', getters.houseMessage.concat([Object.assign({}, tarCord, record)])) // 消息列表，开门推送+SSO申请
                         break
                       default:
                         break
@@ -132,8 +141,8 @@ const user = {
             err => {
               console.log('连接断开', err)
               commit('OPEN_SOCKET', null)
-              dispatch('connection')
               reject()
+              // dispatch('connection')
             }
           )
         } catch (error) {
@@ -144,7 +153,7 @@ const user = {
     getWatchHeartRates ({ dispatch, commit, state }, message) {
       return new Promise(async (resolve, reject) => {
         if (!state.elderList.length) {
-          await dispatch('setelderList')
+          await dispatch('setelderList').catch(err => {})
         }
         const deviceList = []
         state.elderList.forEach(ele => {
@@ -168,7 +177,7 @@ const user = {
     getWatchBloodPressure ({ dispatch, commit, state }, message) {
       return new Promise(async (resolve, reject) => {
         if (!state.elderList.length) {
-          await dispatch('setelderList')
+          await dispatch('setelderList').catch(err => {})
         }
         const deviceList = []
         state.elderList.forEach(ele => {
@@ -192,7 +201,7 @@ const user = {
     getWatchLocation ({ dispatch, commit, state }, message) {
       return new Promise(async (resolve, reject) => {
         if (!state.elderList.length) {
-          await dispatch('setelderList')
+          await dispatch('setelderList').catch(err => {})
         }
         const deviceList = []
         state.elderList.forEach(ele => {

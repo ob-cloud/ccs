@@ -33,10 +33,16 @@ const NurseAPI = {
     return request.post('/nursinghome/css/nurse/calltask/update', {callTaskId: id})
   },
   getCalltask (params) {
-    return request.get('/nursinghome/css/nurse/calltask/list', params)
+    return request.get('/nursinghome/css/msg/list', params)
   },
   sendVist (elderId) {
     return request.post('/nursinghome/css/nurse/vist', {elderId})
+  },
+  ackNurseMsg (params) {
+    return request.post('/nursinghome/css/nurse/msg/ack', params)
+  },
+  refuseNurseMsg (params) {
+    return request.post('/nursinghome/css/nurse/msg/refuse', params)
   }
 }
 export default NurseAPI

@@ -6,7 +6,7 @@
           <el-row type="flex" class="row-bg box_title" justify="center">
             <p class="box_title-left">
               <i class="el-icon-tickets text-number"></i>
-              组织数：<span class="text-number">5</span>
+              组织数：<span class="text-number">2</span>
               <br>
               <i class="el-icon-news text-number"></i>
               员工数：<span class="text-number">31</span>
@@ -17,7 +17,7 @@
               床位总数：<span class="text-number">251</span> <sub> 个</sub>
             </p>
             <p  class="box_title-right">
-              服务总时间：<span class="text-number">9542.21</span> <sub> 小时</sub>
+              服务总时间：<span class="text-number">{{userHourse}}</span> <sub> 小时</sub>
               <br>
               一周工单数：<span class="text-number">321</span> <sub> 个</sub>
             </p>
@@ -34,10 +34,10 @@
                 </div>
                 <div class="bottom clearfix">
                   <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
-                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率" @click="showChart(item, '1', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i> {{getbedInfo(item.list)}}</el-button>
                 </div>
                 <div class="bottom clearfix">
-                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压" @click="showChart(item, '2', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i> {{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
                 </div>
               </div>
             </el-card>
@@ -48,14 +48,14 @@
               </div>
               <div @click="showChart(item, '1', item.elderName)" class="handle-point">
                 <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
-                  <el-button icon="el-icon-video-camera-solid" size="mini" circle title="实时监控" @click="showVedio(item)"></el-button> {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
+                  <el-button icon="el-icon-video-camera-solid" size="mini" circle title="实时监控" @click.stop="showVedio(item)"></el-button> {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
                 </div>
                 <div class="bottom clearfix">
-                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i>{{item.heartRate | deviceDataFilter}}</el-button>
-                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率" @click="showChart(item, '1', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list)}}</el-button>
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
+                  <el-button type="text" icon="obicon obicon-cexinshuai" style="float:right;" title="手表心率"><i class="obicon obicon-huaban"></i> {{getbedInfo(item.list)}}</el-button>
                 </div>
                 <div class="bottom clearfix">
-                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压" @click="showChart(item, '2', item.elderName)"><i class="obicon obicon-huaban"></i>{{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
+                  <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i> {{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
                 </div>
               </div>
             </el-card>
@@ -70,11 +70,15 @@
           <div slot="header" class="">
             <span>今日服务数据</span>
           </div>
-          <div class="list-parent" id="wrapper" ref="listParent">
+          <div class="list-parent" id="wrapper" ref="listParent" @mouseenter="clearScroll2"  @mouseleave="ifScroll2">
             <div class="list scroll-test" ref="list2" v-bind:class="{ 'open-scroll' : openSroll2}">
-              <div class="item" v-for="(item, index) in todayServerList" :key="index" >
-                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
-                <span class="time">&nbsp;{{item.execTime}}</span>
+              <div class="item" v-for="(item, index) in todayServerList" :key="index" @click="sureServer(item)">
+                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.taskName}}</p>
+                <span class="time">&nbsp;{{item.completeTime ? '(已确认)' + item.completeTime : '待确认'}}</span>
+              </div>
+              <div v-if="!todayServerList.length" class="text-center">
+                <br>
+                <el-button type="primary" size="mini" @click="getDailyTask">重新获取数据</el-button>
               </div>
             </div>
           </div>
@@ -86,18 +90,15 @@
           <div class="list-parent"  id="wrapper2" ref="listParent">
             <div class="list" v-bind:class="{ 'open-scroll' : openSroll}" ref="list">
               <div class="item" v-for="(item, index) in houseMessage" :key="index" @click="dealMessage(item)">
-                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName}}</p>
-                <span class="time">&nbsp;{{item.execTime || item.time}}</span>
+                <p class="desc">{{item.roomNo}}-{{item.bedNo}} {{item.elderName}}：{{item.callTaskName || item.taskName}}</p>
+                <span class="time">&nbsp;{{item.execTime || item.time || '未处理'}}</span>
               </div>
-              <!-- <div class="item" v-for="(item, index) in testList" :key="index + '-1'" @click="dealMessage(item)">
-                <p class="desc">{{item.text}}</p>
-                <span class="time">2013:12:21</span>
-              </div> -->
             </div>
           </div>
         </el-card>
       </div>
-    </section><el-dialog
+    </section>
+    <el-dialog
       title="提示"
       :visible.sync="dealDialog"
       width="20%"
@@ -112,17 +113,34 @@
         <el-button type="primary" @click="overcomeMessage">确 定</el-button>
       </span>
     </el-dialog>
+    <el-dialog
+      title="提示"
+      :visible.sync="centerDialogVisible"
+      width="300px"
+      center>
+      <p class="text-center"><strong>{{ackInfo && ackInfo.elderName}}：{{ackInfo && (ackInfo.callTaskName || ackInfo.taskName)}}</strong></p>
+      <br>
+      <p class="text-center">时间：{{ackInfo && ackInfo.startTime}} ~ {{ackInfo && ackInfo.endTime}}</p>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="sureAck">通 过</el-button>
+        <el-button @click="refuseAck" type="danger">拒 绝</el-button>
+        <el-button @click="centerDialogVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </section>
 </template>
 
 <script>
 // import HouseAPI from '@/api/house'
-// import DeviceAPI from '@/api/device'
+import ElderAPI from '@/api/elder'
 import NurseAPI from '@/api/nurse'
 // import IScroll from 'iscroll'
-import Helper from '@/common/helper'
 import { mapGetters } from 'vuex'
 import { setInterval } from 'timers'
+import dayjs from 'dayjs'
+import Helper from '@/common/helper'
+// import videojs from 'video.js'
+import 'videojs-contrib-hls'
 export default {
   data () {
     return {
@@ -138,95 +156,21 @@ export default {
       scrollTime2: null,
       openSroll: false,
       openSroll2: false,
-      todayServerList: [{
-        'id': 1,
-        'roomNo': 'B102',
-        'elderName': '刘秋菊',
-        'bedNo': 'B3',
-        'callTaskName': '测量血压体温并记录',
-        'execTime': '2019-10-30 09:24:23'
-      }, {
-        'id': 2,
-        'roomNo': 'B103',
-        'elderName': '黄观勤',
-        'bedNo': 'B1',
-        'callTaskName': '喂老人吃饭吃药',
-        'execTime': '2019-10-30 10:24:44'
-      }, {
-        'id': 3,
-        'roomNo': 'B104',
-        'elderName': '张辟妹',
-        'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-30 10:30:23'
-      }, {
-        'id': 4,
-        'roomNo': 'B104',
-        'elderName': '朱美婵',
-        'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-30 11:20:44'
-      }, {
-        'id': 5,
-        'roomNo': 'B104',
-        'elderName': '朱美婵',
-        'bedNo': 'B1',
-        'callTaskName': '吃药',
-        'execTime': '2019-10-30 12:21:23'
-      }, {
-        'id': 6,
-        'roomNo': 'B104',
-        'elderName': '王伟',
-        'bedNo': 'B1',
-        'callTaskName': '测量血压体温并记录',
-        'execTime': '2019-10-30 12:50:44'
-      }, {
-        'id': 7,
-        'roomNo': 'B104',
-        'elderName': '王伟',
-        'bedNo': 'B1',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-30 13:10:23'
-      }, {
-        'id': 8,
-        'roomNo': 'B104',
-        'elderName': '朱美婵',
-        'bedNo': 'B1',
-        'callTaskName': '看电视',
-        'execTime': '2019-10-30 13:21:44'
-      }, {
-        'id': 9,
-        'roomNo': 'B104',
-        'elderName': '张敏',
-        'bedNo': 'B1',
-        'callTaskName': '阅读',
-        'execTime': '2019-10-30 13:54:23'
-      }, {
-        'id': 10,
-        'roomNo': 'B104',
-        'elderName': '王伟',
-        'bedNo': 'B1',
-        'callTaskName': '户外活动',
-        'execTime': '2019-10-30 15:24:44'
-      }, {
-        'id': 11,
-        'roomNo': 'B104',
-        'elderName': '朱美婵',
-        'bedNo': 'B1',
-        'callTaskName': '喂老人吃饭吃药',
-        'execTime': '2019-10-30 17:24:23'
-      }, {
-        'id': 12,
-        'roomNo': 'B204',
-        'elderName': '张敏',
-        'bedNo': 'B3',
-        'callTaskName': '帮助肢体活动',
-        'execTime': '2019-10-30 19:24:44'
-      }],
+      todayServerList: [],
       myScroll: null,
       myScroll2: null,
       dealDialog: false,
-      visitInfo: {}
+      visitInfo: {},
+      userHourse: 0,
+      newsScrollTime: {
+        firstTime: null,
+        secendTime: null,
+        threeTime: null,
+      },
+      false: true,
+      centerDialogVisible: false,
+      ackInfo: null, // 家属申请内容
+      Player: null
     }
   },
   filters: {
@@ -257,19 +201,42 @@ export default {
       'elderList'
     ])
   },
+  created () {
+    this.userHourse = (dayjs(new Date() - dayjs('2019-9-1')) / 3600000).toFixed(2)
+    this.getDailyTask()
+    console.log(this.houseMessage)
+  },
   mounted () {
     this.fixLayout()
     Helper.windowOnResize(this, this.fixLayout)
     this.ticket = setInterval(() => {
-      this.getElderList()
+      // this.getElderList()
     }, 20000)
+    this.getSerialInfo()
     this.$nextTick(() => {
       this.ifScroll()
-      // this.myScroll = new IScroll('#wrapper', {
-      //   snap: true
-      // })
-      this.ifScroll2()
     })
+    // 播放器
+    // var options = {};
+    // var player = videojs('example_video_1', options, function onPlayerReady() {
+    //   console.log('播放器已经准备好了!');
+    //   setTimeout(() => {
+    //     this.play().catch(err => {
+    //       console.log(err)
+    //     })
+    //   }, 2000)
+    //   this.on('canplay', function() {//可以播放，但中途可能因为加载而暂停
+    //       console.log("可以播放，但中途可能因为加载而暂停")
+    //   });
+    //   this.on('ended', function() {
+    //     console.log('播放结束了!');
+    //   });
+    //   this.on('error', function() {
+    //     console.log('播放结束了!');
+    //   });
+    // },err => {
+    //   console.log('player', err)
+    // });
   },
   watch: {
     houseMessage (val, eldValue) {
@@ -283,10 +250,11 @@ export default {
   methods: {
     fixLayout () {
       this.boxContainerHeight = Helper.calculateTableHeight() + 80
+      this.$store.dispatch('updateDocumentClientHeight', document.documentElement.clientHeight)
     },
     getElderList () {
       this.$store.dispatch('setelderList').then(res => {
-        this.getSerialInfo()
+        // this.getSerialInfo()
       }).catch(err => {})
     },
     handleNodeClick (e) {
@@ -355,20 +323,69 @@ export default {
     },
     ifScroll2 () {
       // 开启滚动定时器
-      setTimeout(() => {
+      this.clearScroll2()
+      this.openSroll2 = false
+      if (!this.todayServerList.length) return
+      this.newsScrollTime.firstTime = setTimeout(() => {
         this.openSroll2 = true
-        setTimeout(() => {
+        this.newsScrollTime.secendTime = setTimeout(() => {
           this.openSroll2 = false
           this.todayServerList.push(this.todayServerList.shift())
-          setTimeout(() => {
+          this.newsScrollTime.threeTime = setTimeout(() => {
             this.ifScroll2()
           }, 6000)
         }, 2000)
       }, 4000)
     },
+    clearScroll2 () {
+      const key = Object.keys(this.newsScrollTime)
+      key.forEach(ele => {
+        this.newsScrollTime[ele] && clearTimeout(this.newsScrollTime[ele])
+      })
+    },
     dealMessage (item) {
-      this.visitInfo = item
-      this.dealDialog = true
+      switch (item.type) {
+        case 1:
+          this.visitInfo = item
+          this.dealDialog = true
+          break
+        case 7:
+          this.ackInfo = item
+          this.centerDialogVisible = true
+          break
+        default:
+          break
+      }
+    },
+    sureAck () {
+      NurseAPI.ackNurseMsg({
+        msgId: this.ackInfo.msgId
+      }).then(res => {
+        if (res.code === 0) {
+          this.$message.success('申请已通过')
+          this.$store.dispatch('setHouseAlarmMessage', this.houseMessage.filter(ele => ele.msgId !== this.ackInfo.msgId))
+          this.centerDialogVisible = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        this.$message.error(err.msg)
+      })
+    },
+    refuseAck () {
+      NurseAPI.refuseNurseMsg({
+        mgsId: this.ackInfo.msgId
+      }).then(res => {
+        if (res.code === 0) {
+          this.$message.success('申请已拒绝')
+          this.$store.dispatch('setHouseAlarmMessage', this.houseMessage.filter(ele => ele.msgId !== this.ackInfo.msgId))
+          this.centerDialogVisible = false
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        this.$message.error(err.msg)
+      })
     },
     sendVisit () {
       NurseAPI.sendVist(this.visitInfo.elderId).then(resp => {
@@ -411,7 +428,8 @@ export default {
           query: {
             serialId: tarDevice.serialId,
             tab,
-            elderName
+            elderName,
+            type: row.type
           }
         })
       } else {
@@ -420,6 +438,41 @@ export default {
     },
     showVedio (item) {
       this.$message.info('功能开发中')
+    },
+    getDailyTask () {
+      ElderAPI.getDailyTask({
+        startTime: dayjs(new Date()).format('YYYY-MM-DD'),
+        endTime: dayjs(new Date()).add(1, 'day').format('YYYY-MM-DD')
+      }).then(res => {
+        if (res.code === 0) {
+          this.todayServerList = res.data.records
+          this.ifScroll2()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        this.$message.error('获取服务数据失败')
+        console.log('err', err)
+      })
+    },
+    sureServer (item) {
+      if (item.status) return
+      this.$confirm(`确认完成任务${item.elderName}:${item.taskName}`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        ElderAPI.ackDailyTask({
+          taskLogId: item.taskLogId,
+        }).then(res => {
+          if (res.code === 0) {
+            this.$message.success('已确认完成')
+            this.getDailyTask()
+          }
+        }).catch(err => {
+          this.$message.error(err.msg)
+        })
+      }).catch(() => {})
     }
   },
   beforeDestroy () {
@@ -427,6 +480,7 @@ export default {
     this.timer && clearInterval(this.timer._id)
     this.scrollTime && clearTimeout(this.scrollTime)
     this.scrollTime2 && clearTimeout(this.scrollTime2)
+    this.clearScroll2()
   }
 }
 </script>
@@ -501,6 +555,12 @@ $ob-blue: rgb(0, 91, 172);
   height: 100%;
   overflow: hidden;
   box-shadow: 0 2px 12px 0 rgba(252, 252, 252, 0.3);
+}
+#wrapper:hover .scroll-test{
+  animation-play-state: paused;
+}
+.text-center {
+  text-align: center;
 }
 .box-aside .list-parent .open-scroll{
   position:relative;
@@ -596,6 +656,10 @@ $ob-blue: rgb(0, 91, 172);
     border: 1px solid rgb(243, 68, 68);
     box-shadow: 0 1px 30px rgb(243, 68, 68);
   }
+}
+@keyframes back
+{
+to {top: 0px;}
 }
 @keyframes mymove
 {

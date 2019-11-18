@@ -18,6 +18,21 @@ const ElderAPI = {
   },
   checkIn (params) {
     return request.post('nursinghome/ccs/checkin/create', params)
+  },
+  getTaskList (params) {
+    return request.get('nursinghome/css/elder/task/list', params)
+  },
+  updateTask (params) {
+    return request.post('nursinghome/css/dailyTask/create', params)
+  },
+  deleteTask (params) {
+    return request.post('nursinghome/css/task/delete', params)
+  },
+  getDailyTask (params) {
+    return request.get('nursinghome/css/nurse/dailyTask/list', params)
+  },
+  ackDailyTask (params) {
+    return request.post('nursinghome/css/nurse/dailyTask/ack', params)
   }
 }
 export default ElderAPI

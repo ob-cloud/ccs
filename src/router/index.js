@@ -29,7 +29,7 @@ router.beforeEach(async (to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' })
     } else {
-      if (!store.state.elder.stompClient) await store.dispatch('setelderList').then(res => { }).catch(async err => { await store.dispatch('setelderList') })
+      if (!store.state.elder.stompClient) await store.dispatch('setelderList').catch(err => { })
       next()
     }
   } else {

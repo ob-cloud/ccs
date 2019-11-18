@@ -23,6 +23,9 @@ const DeviceAPI = {
   },
   bloodPressureHistory (params = {}) {
     return request.get('/nursinghome/css/watch/bloodPressure/history', {...params})
+  },
+  mattresHeartRateHistory (params = {}) {
+    return request.get('/nursinghome/css/mattres/heartRate/history', {...params})
   }
 }
 export default DeviceAPI

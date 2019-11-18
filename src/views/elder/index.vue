@@ -74,48 +74,48 @@
       </div>
     </el-dialog>
 
-    <el-dialog top="2%" width="60%" title="日程安排" :visible.sync="programmeDialogVisible" :close-on-click-modal="false">
-     <el-table
-      :data="tableData2"
-      style="width: 100%">
-      <el-table-column
-        prop="date"
-        label="日期"
-        width="200">
-        <template slot-scope="scope">
-          {{scope.row.startDate}} 至 {{scope.row.endDate}}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="address"
-        label="日程">
-        <template slot-scope="scope">
-            <el-table
-            :data="scope.row.orderList"
-            border
-            style="width: 100%">
-            <el-table-column
-              prop="startHouse"
-              label="开始时间"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="endHouse"
-              label="结束时间"
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="order"
-              label="事件">
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>
-    </el-table>
-      <div slot="footer" class="dialog-footer text-center" >
-        <el-button @click="programmeDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="programmeDialogVisible = false">确 认</el-button>
-      </div>
+    <el-dialog top="2%" width="1060px" title="日程安排" center :visible.sync="programmeDialogVisible" :close-on-click-modal="false">
+      <el-form :inline="true" :model="orderForm" class="demo-form-inline" size="small">
+        <el-form-item label="日期">
+          <el-date-picker
+            style="width:300px"
+            v-model="orderForm.dateList"
+            type="daterange"
+            unlink-panels
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="yyyy-MM-dd">
+          </el-date-picker>
+        </el-form-item>
+        <el-form-item label="时间">
+          <el-time-select
+            v-model="orderForm.fromTime"
+            :picker-options="{
+              start: '00:00',
+              step: '00:30',
+              end: '24:00'
+            }"
+            placeholder="选择时间">
+          </el-time-select>
+        </el-form-item>
+        <el-form-item label="事件">
+          <el-input v-model="orderForm.taskName" placeholder="事件"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" :disabled="!(orderForm.dateList.length && orderForm.fromTime && orderForm.taskName)" @click="addOrder">{{orderForm.taskId ? '更新' : '新增'}}</el-button>
+          <el-button v-if="orderForm.taskId" plain @click="cancelOrderUpdate">取消更新</el-button>
+        </el-form-item>
+      </el-form>
+      <base-table
+        :tableData="tableData2"
+        :columns="columns2"
+        border
+        v-loading="tableLoading2"
+        :pageTotal="total2"
+        :pageSize="search2.pageSize"
+        @on-current-page-change="onOrderCurrentChange"
+        @on-page-size-change="onOrderSizeChange">
+      </base-table>
     </el-dialog>
   </div>
 </template>
@@ -140,10 +140,12 @@ import BmMarker from 'vue-baidu-map/components/overlays/Marker.vue'
 import BmPolygon from 'vue-baidu-map/components/overlays/Polygon.vue'
 import BmGeolocation from 'vue-baidu-map/components/controls/Geolocation.vue'
 import { mapGetters } from 'vuex'
+import dayjs from 'dayjs'
 export default {
   data () {
     return {
       tableLoading: true,
+      tableLoading2: true,
       tableHeight: 0,
       search: {
         name: '',
@@ -152,9 +154,22 @@ export default {
         pageNo: PAGINATION_PAGENO,
         pageSize: PAGINATION_PAGESIZE
       },
+      search2: {
+        pageNo: PAGINATION_PAGENO,
+        pageSize: PAGINATION_PAGESIZE
+      },
       total: 0,
+      total2: 0,
       tableData: [],
       columns: [],
+      columns2: [],
+      orderForm: {
+        'dateList': [],
+        'fromTime': '',
+        'taskName': '',
+        'elderId': '',
+        'taskId': ''
+      },
       createDialogVisible: false,
       dialogAction: '添加老人',
       elderModel: null,
@@ -171,67 +186,7 @@ export default {
         bedNo: ''
       },
       programmeDialogVisible: false,
-      tableData2: [{
-        startDate: '2016-05-02',
-        endDate: '2016-05-18',
-        orderList: [
-          {
-            startHouse: '07:00',
-            endHouse: '8:00',
-            order: '晨读'
-          },
-          {
-            startHouse: '08:00',
-            endHouse: '11:00',
-            order: '清洁卫生'
-          },
-          {
-            startHouse: '11:00',
-            endHouse: '12:00',
-            order: '午餐'
-          },
-          {
-            startHouse: '12:30',
-            endHouse: '13:00',
-            order: '吃药'
-          },
-          {
-            startHouse: '17:00',
-            endHouse: '18:00',
-            order: '晚餐'
-          },
-          {
-            startHouse: '19:30',
-            endHouse: '20:00',
-            order: '洗澡'
-          }
-        ]
-      }, {
-        startDate: '2016-06-04',
-        endDate: '2016-07-04',
-        orderList: [
-          {
-            startHouse: '08:00',
-            endHouse: '11:00',
-            order: '清洁卫生'
-          },
-          {
-            startHouse: '11:00',
-            endHouse: '12:00',
-            order: '午餐'
-          },
-          {
-            startHouse: '17:00',
-            endHouse: '18:00',
-            order: '晚餐'
-          },
-          {
-            startHouse: '19:30',
-            endHouse: '20:00',
-            order: '洗澡'
-          }
-        ]
-      }],
+      tableData2: [],
       // 地图的数据
       center: {
         lng: 113.8385127760,
@@ -252,20 +207,12 @@ export default {
         { 'lng': 113.835782, 'lat': 23.378651 }
       ],
       showPolygonPath: [],
-      elderEchartInfo: {
-        manNum: 0,
-        womenNum: 0,
-        fiftyNum: 0,
-        sixty: 0,
-        seventy: 0,
-        eighty: 0,
-        eightyMore: 0
-      }
     }
   },
   components: {BaseTable, elderCreate, BaiduMap, BmNavigation, BmMarker, BmPolygon, BmGeolocation},
   created () {
     this.columns = this.getColumns()
+    this.columns2 = this.getColumns2()
     this.getElderList()
     this.tableDataEchart.push({
       'id': 1,
@@ -303,7 +250,39 @@ export default {
     ...mapGetters([
       'elderList',
       'serialInfo'
-    ])
+    ]),
+    elderEchartInfo () {
+      const elderEchartInfo = {
+        manNum: 0,
+        womenNum: 0,
+        fiftyNum: 0,
+        sixty: 0,
+        seventy: 0,
+        eighty: 0,
+        eightyMore: 0
+      }
+      for (let index = 0; index < this.elderList.length; index++) {
+        const element = this.elderList[index]
+        // 处理年龄分布以及男女比例（暂无）
+        if (element.gender === 1) {
+          elderEchartInfo.womenNum += 1
+        } else {
+          elderEchartInfo.manNum += 1
+        }
+        if (element.age > 80) {
+          elderEchartInfo.eightyMore += 1
+        } else if (element.age > 70) {
+          elderEchartInfo.eighty += 1
+        } else if (element.age > 60) {
+          elderEchartInfo.seventy += 1
+        } else if (element.age > 50) {
+          elderEchartInfo.sixty += 1
+        } else {
+          elderEchartInfo.fiftyNum += 1
+        }
+      }
+      return elderEchartInfo
+    }
   },
   watch: {
     serialInfo: {
@@ -326,13 +305,10 @@ export default {
         this.showPolygonPath = path
       }
     },
-    elderList: {
+    elderEchartInfo: {
       deep: true,
-      handler  (val, oldVal) {
-        for (let index = 0; index < val.length; index++) {
-          // const element = val[index]
-          // 处理年龄分布以及男女比例（暂无）
-        }
+      handler (val, oldVal) {
+        this.drawelder()
       }
     }
   },
@@ -448,31 +424,6 @@ export default {
         minWidth: '160px',
         align: 'center'
       },
-      // {
-      //   label: '联系人',
-      //   prop: 'contacts',
-      //   align: 'center'
-      // }, {
-      //   label: '联系人号码',
-      //   prop: 'contactsPhone',
-      //   align: 'center'
-      // },
-      // {
-      //   label: '入住时间',
-      //   prop: 'checkInTime',
-      //   align: 'center',
-      //   formatter (val) {
-      //     return val && Helper.parseTime(val)
-      //   }
-      // },
-      // {
-      //   label: '退院时间',
-      //   prop: 'checkOutTime',
-      //   align: 'center',
-      //   formatter (val) {
-      //     return val && Helper.parseTime(val)
-      //   }
-      // },
       {
         label: '操作',
         align: 'center',
@@ -482,7 +433,7 @@ export default {
     },
     getToolboxRender (h, row) {
       return [
-        <el-button size="tiny" title="日程安排" icon="el-icon-tickets" onClick={() => { this.programmeDialogVisible = true }}></el-button>,
+        <el-button size="tiny" title="日程安排" icon="el-icon-tickets" onClick={() => this.getTaskList(row)}></el-button>,
         <el-button size="tiny" title="安排入住" icon="el-icon-s-help" onClick={() => this.handleCheckIn(row)}></el-button>,
         <el-button size="tiny" title="编辑老人" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
         <el-button size="tiny" title="删除" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
@@ -661,7 +612,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: ['50岁以下', '50-60岁', '60-70岁', '70-80岁', '70岁以上'],
+            data: ['50岁以下', '50-60岁', '60-70岁', '70-80岁', '80岁以上'],
             axisTick: {
               alignWithLabel: true
             }
@@ -676,7 +627,7 @@ export default {
           {
             type: 'bar',
             barWidth: '60%',
-            data: [10, 52, 20, 23, 32, 31, 22]
+            data: [this.elderEchartInfo.fiftyNum, this.elderEchartInfo.sixty, this.elderEchartInfo.seventy, this.elderEchartInfo.eighty, this.elderEchartInfo.eightyMore]
           },
           {
             name: '访问来源',
@@ -684,8 +635,8 @@ export default {
             radius: '40%',
             center: ['75%', '50%'],
             data: [
-              {value: 51, name: '男性'},
-              {value: 20, name: '女性'}
+              {value: this.elderEchartInfo.manNum, name: '男性'},
+              {value: this.elderEchartInfo.womenNum, name: '女性'}
             ],
             label: {
               formatter: '{b}: {@2012} ({d}%)'
@@ -708,11 +659,128 @@ export default {
     updatePolygonPath (e) {
       this.polygonPath = e.target.getPath()
     },
+    getTaskList (row) {
+      console.log('row', row)
+      this.search2.pageNo = 1
+      this.total2 = 0
+      this.tableData2 = []
+      this.orderForm.elderId = row.elderId || row.id
+      this.programmeDialogVisible = true
+      this.getOrderList()
+    },
+    getColumns2 () {
+      return [{
+        label: '开始日期',
+        prop: 'startTime',
+        align: 'center',
+        formatter (val) {
+          return dayjs(val).format('YYYY-MM-DD')
+        }
+      }, {
+        label: '结束日期',
+        prop: 'endTime',
+        align: 'center',
+        formatter (val) {
+          return dayjs(val).format('YYYY-MM-DD')
+        }
+      }, {
+        label: '开始时间',
+        prop: 'fromTime',
+        align: 'center',
+      }, {
+        label: '事件',
+        prop: 'taskName',
+        minWidth: '160px',
+        align: 'center'
+      },
+      {
+        label: '操作',
+        align: 'center',
+        minWidth: '100px',
+        renderBody: this.getOrderRender
+      }]
+    },
+    getOrderRender (h, row) {
+      return [
+        <el-button size="tiny" title="编辑日程" icon="el-icon-edit" onClick={() => this.editOrder(row)}></el-button>,
+        <el-button size="tiny" title="删除" icon="el-icon-delete" onClick={() => this.delectOrder(row)}></el-button>
+      ]
+    },
+    getOrderList () {
+      this.tableLoading2 = true
+      ElderAPI.getTaskList({elderId: this.orderForm.elderId, ...this.search2}).then(res => {
+        if (res.code === 0) {
+          this.total2 = res.data.total
+          this.tableData2 = res.data.records
+        }
+        this.tableLoading2 = false
+      }).catch(err => {
+        this.tableLoading2 = false
+        this.$message.error(err.msg || '获取失败')
+      })
+    },
+    onOrderCurrentChange (pageNo) {
+      this.search2.pageNo = pageNo
+      this.getOrderList()
+    },
+    onOrderSizeChange (pageSize) {
+      this.search2.pageSize = pageSize
+      this.getOrderList()
+    },
+    addOrder () {
+      ElderAPI.updateTask({
+        'elderId': this.orderForm.elderId,
+        'taskName': this.orderForm.taskName,
+        'startTime': this.orderForm.dateList[0],
+        'endTime': this.orderForm.dateList[1],
+        'fromTime': this.orderForm.fromTime,
+        'taskId': this.orderForm.taskId,
+      }).then(res => {
+        if (res.code === 0) {
+          if (this.orderForm.taskId) {
+            this.cancelOrderUpdate()
+          }
+          this.$message.success(`${this.orderForm.taskId ? '更新' : '添加'}成功`)
+          this.getOrderList()
+        }
+      }).catch(err => {
+        this.$message.error(err.msg || '操作失败')
+        this.getOrderList()
+      })
+    },
+    cancelOrderUpdate () {
+      this.orderForm.dateList = []
+      this.orderForm.fromTime = ''
+      this.orderForm.taskName = ''
+      this.orderForm.taskId = ''
+    },
+    editOrder (item, index) {
+      this.orderForm.dateList = [item.startTime, item.endTime]
+      this.orderForm.fromTime = item.fromTime
+      this.orderForm.taskName = item.taskName
+      this.orderForm.elderId = item.elderId
+      this.orderForm.taskId = item.taskId
+    },
+    delectOrder (row) {
+      ElderAPI.deleteTask({taskId: row.taskId}).then(res => {
+        if (res.code === 0) {
+          this.$message.success('删除成功')
+          if (this.tableData2.length === 1 && this.search2.pageNo > 1) {
+            this.search2.pageNo -= 1
+          }
+          this.getOrderList()
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        this.$message.error(err.msg || '删除失败')
+      })
+    }
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .content{
   padding: 20px;
 }
@@ -723,6 +791,31 @@ export default {
 .bm-view {
   width: 100%;
   height: 500px;
+}
+.line-height_28 {
+  line-height: 28px;
+}
+.order-list {
+  border: 1px solid #f5efef;
+  margin-bottom: 10px;
+  padding: 10px;
+  .flex-width_360 {
+    width: 360px;
+    font-weight: bold;
+    .order_open_edit {
+      margin-top: 10px;
+    }
+  }
+  .flex-others {
+    flex-grow: 1;
+    text-decoration: none;
+    list-style: none;
+    text-align: center;
+    .order-item {
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+  }
 }
 </style>
 <style>
