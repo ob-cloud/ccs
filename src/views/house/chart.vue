@@ -37,8 +37,7 @@
       <el-tab-pane label="直播">
         <strong slot="label">直播</strong>
         <div>
-          <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none"
-                poster="http://vjs.zencdn.net/v/oceans.png">
+          <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none">
             <source src="http://hls.open.ys7.com/openlive/b7aa4096c0fb45c3b76dd561467c5fc6.m3u8" type="application/x-mpegURL">
           </video>
         </div>
