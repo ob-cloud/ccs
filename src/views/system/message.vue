@@ -394,4 +394,13 @@ export default {
 .el-table .color-red {
   background: rgba(255, 0, 0, 0.3);
 }
+.message {
+  .el-tabs__item.is-active {
+    color: #fff;
+    font-weight: bold;
+  }
+  .el-tabs__item {
+    color:#919398
+  }
+}
 </style>

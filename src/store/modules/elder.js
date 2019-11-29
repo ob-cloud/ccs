@@ -76,7 +76,7 @@ const user = {
               state.stompClient.subscribe(
                 `/user/${Storage.getToken()}/remindByAli`,
                 response => {
-                  console.log('websock' + new Date(), response)
+                  // console.log('websock' + new Date(), response)
                   try {
                     const record = JSON.parse(response.body)
                     let tarCord = {}
@@ -111,8 +111,7 @@ const user = {
               state.stompClient.subscribe(
                 `/user/pushmsg/remindByAli`,
                 response => {
-                  console.log('websock2' + new Date(), response)
-                  console.log('state' + new Date(), state)
+                  // console.log('websock2' + new Date(), response)
                   try {
                     const record = JSON.parse(response.body)
                     let tarCord = {}
@@ -190,7 +189,7 @@ const user = {
         if (!deviceList.length) {
           reject('暂无数据')
         } else {
-          DeviceAPI.getWatchBloodPressure({serialId: deviceList.join(',')}).then(res => {
+          DeviceAPI.getWatchBloodPressure({serialId: message || deviceList.join(',')}).then(res => {
             resolve(res)
           }).catch(err => {
             reject(err)

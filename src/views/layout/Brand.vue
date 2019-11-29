@@ -54,7 +54,7 @@ export default {
 </script>
 <style lang="scss">
 .color-navbar  .dropdown {
-  color: #303133;
+  color: #fff;
   font-weight: bold;
 }
 </style>

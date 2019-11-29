@@ -421,8 +421,8 @@ export default {
       return '-'
     },
     showChart (row, tab, elderName) {
-      const tarDevice = row.list.find(ele => ele.deviceType === 2)
-      if (tarDevice) {
+      const tarDevice = row.list.find(ele => ele.deviceType === 2) || {}
+      if (row) {
         this.$router.push({
           path: '/dashboard/chart.html',
           query: {
@@ -514,7 +514,7 @@ $ob-blue: rgb(0, 91, 172);
 }
 .box-container{
   background: #fff;
-  background: linear-gradient(to bottom, rgb(11, 20, 27) 0%, rgb(39, 45, 83) 50%, rgb(17, 33, 46) 100%);
+  background: #1A2C6B;
   padding: 20px;
   float: left;
   width: calc(100% - 270px);
@@ -540,7 +540,7 @@ $ob-blue: rgb(0, 91, 172);
   float: right;
   width: 260px;
   margin-left: 10px;
-  background: linear-gradient(to bottom, rgb(3, 22, 37) 0%, rgb(16, 25, 88) 50%, rgb(17, 33, 46) 100%);
+  background: linear-gradient(to bottom, rgb(39, 64, 153) 0%, #1A2C6B 50%, rgb(19, 32, 78) 100%);
 }
 .box-aside .el-card {
   transition: 0ms;
