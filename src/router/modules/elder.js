@@ -11,6 +11,12 @@ export default [
     path: '/elder/index.html',
     desc: '老人管理',
     component: () => import('views/elder/index.vue')
+  },
+  {
+    name: '/elder/history.html',
+    path: '/elder/history.html',
+    desc: '老人历史记录',
+    component: () => import('views/elder/history.vue')
   }
 ]
 

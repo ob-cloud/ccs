@@ -1,10 +1,10 @@
 <template>
-  <div class="device">
+  <div class="nurse">
     <base-table
       :height="tableHeight"
       :tableData="tableData"
       :columns="columns"
-      stripe border
+      stripe
       v-loading="tableLoading"
       :pageTotal="total"
       :pageSize="search.pageSize"
@@ -229,8 +229,19 @@ export default {
 }
 </script>
 
-<style scoped>
-.device{
+<style lang="scss">
+.nurse{
   padding: 20px;
+  .el-table__header {
+    tr {
+      th {
+        background-color: #1C3386;
+        color:#FFFFFF;
+      }
+    }
+  }
+   .el-pagination__total, .el-pagination__jump {
+    color: #fff;
+  }
 }
 </style>

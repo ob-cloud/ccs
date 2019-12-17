@@ -7,7 +7,6 @@
           :height="tableHeight"
           :tableData="tableData"
           :columns="columns"
-          border
           v-loading="tableLoading"
           :pageTotal="total"
           :showPagination="true"
@@ -23,7 +22,6 @@
           :height="tableHeight - 50"
           :tableData="tableDataDaily"
           :columns="columnsDaily"
-          border
           v-loading="dailyLoading"
           :pageTotal="totalDaily"
           :showPagination="true"
@@ -389,18 +387,37 @@ export default {
 </style>
 <style lang="scss">
 .el-table .color-green {
-  background: rgba(0, 128, 0, 0.3);
+  background: #fff;
 }
 .el-table .color-red {
-  background: rgba(255, 0, 0, 0.3);
+  background: #F6C6C6;
 }
 .message {
+  .el-tabs__active-bar {
+    height: 3px;
+    background-color: #0082FF;
+  }
+  .el-table__header {
+    tr {
+      th {
+        background-color: #1C3386;
+        color:#FFFFFF;
+      }
+    }
+  }
+  .el-tabs__nav-wrap::after {
+    height: 3px;
+    background:rgba(255,255,255,1);
+  }
   .el-tabs__item.is-active {
     color: #fff;
     font-weight: bold;
   }
   .el-tabs__item {
-    color:#919398
+    color:#fFFFFF
+  }
+  .el-pagination__total, .el-pagination__jump {
+    color: #fff;
   }
 }
 </style>

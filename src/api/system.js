@@ -49,6 +49,9 @@ const SystemAPI = {
       url: 'resetPassword',
       params
     })
+  },
+  getdictList (params) {
+    return request.get('nursinghome/ccs/dict/list', {...params})
   }
 }
 export default SystemAPI

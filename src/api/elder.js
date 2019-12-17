@@ -13,8 +13,17 @@ const ElderAPI = {
   createElder (elder) {
     return request.post('nursinghome/ccs/elder/create', elder)
   },
+  updateElder (elder) {
+    return request.post('nursinghome/ccs/elder/update', elder)
+  },
   deleteElder (id) {
-    return request.post('nursinghome/ccs/elder/delete', {id})
+    return request.post('nursinghome/ccs/elder/delete', {elderId: id})
+  },
+  leaveElder (params) {
+    return request.post('nursinghome/ccs/elder/leave', {...params})
+  },
+  bindBed (params) {
+    return request.post('nursinghome/ccs/elder/bindBed', params)
   },
   checkIn (params) {
     return request.post('nursinghome/ccs/checkin/create', params)
@@ -33,6 +42,21 @@ const ElderAPI = {
   },
   ackDailyTask (params) {
     return request.post('nursinghome/css/nurse/dailyTask/ack', params)
+  },
+  bindContactCreat (params) { // 绑定家属
+    return request.post('nursinghome/ccs/contact/create', params)
+  },
+  getContactList (params) { // 获取家属列表
+    return request.get('nursinghome/ccs/contact/list', params)
+  },
+  delectContact (params) { // 绑定家属
+    return request.post('nursinghome/ccs/contact/delete', params)
+  },
+  updateContact (params) { // 更新家属
+    return request.post('nursinghome/ccs/contact/update', params)
+  },
+  getDeviceHistory (params) { // 获取历史数据
+    return request.get('nursinghome/ccs/elder/device/history', params)
   }
 }
 export default ElderAPI

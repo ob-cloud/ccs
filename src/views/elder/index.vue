@@ -1,5 +1,5 @@
 <template>
-  <div class="content">
+  <div class="content elder-index">
     <el-row class="echart_height">
       <el-col :span="12">
         <div id="main" ref="main" style="width: 100%;height:500px;"></div>
@@ -21,18 +21,18 @@
       :row-class-name="tableRowClassName"
       :tableData="tableData"
       :columns="columns"
-      border
       v-loading="tableLoading"
       :pageTotal="total"
       :pageSize="search.pageSize"
+      :pageNo="search.pageNo"
       @on-current-page-change="onCurrentChange"
       @on-page-size-change="onSizeChange">
       <slot>
         <template slot="caption">
           <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="老人名称" v-model="search.name"></el-input>
           <el-select clearable class="caption-item" placeholder="机构类型" v-model="search.type">
-            <el-option label='养老院' :value='0'></el-option>
-            <el-option label='社区' :value='1'></el-option>
+            <el-option label='机构老人' :value='0'></el-option>
+            <el-option label='居家老人' :value='1'></el-option>
           </el-select>
           <el-select clearable class="caption-item" placeholder="住院状态" v-model="search.status">
             <el-option label='退院' :value='0'></el-option>
@@ -45,18 +45,18 @@
         </template>
       </slot>
     </base-table>
-    <el-dialog top="10%" width="85%" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
-      <elder-create :model="elderModel" @data-ready="createElder" @close="flag => createDialogVisible = flag"></elder-create>
+    <el-dialog top="5%" width="85%" :title="dialogAction" :visible.sync="createDialogVisible" :close-on-click-modal="false">
+      <elder-create :model="elderModel" @data-ready="createElder" @close="flag => createDialogVisible = flag" v-if="createDialogVisible"></elder-create>
     </el-dialog>
 
-    <el-dialog top="10%" width="760px" title="安排入住" :visible.sync="checkinDialogVisible" :close-on-click-modal="false">
+    <el-dialog top="10%" width="760px" title="绑定床位" :visible.sync="checkinDialogVisible" :close-on-click-modal="false">
       <el-form ref="checkInForm" :model="checkInModel" label-width="100px">
         <el-form-item label="姓名">
           <el-input class="caption-item w8" placeholder="老人姓名" disabled v-model="checkInModel.elder"></el-input>
         </el-form-item>
-        <el-form-item label="养老院">
+        <!-- <el-form-item label="养老院">
           <el-input class="caption-item w8" placeholder="养老院" v-model="checkInModel.houseName"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="房间" prop="roomId">
           <el-select clearable class="caption-item w8" placeholder="选择房间" v-model="checkInModel.roomId" @change="onChangeRoom">
             <el-option :label='room.room' :value='room.id' v-for="(room, index) in roomList" :key="index"></el-option>
@@ -64,7 +64,7 @@
         </el-form-item>
         <el-form-item label="床" prop="bedNo">
           <el-radio-group v-model="checkInModel.bedNo">
-             <el-radio-button type="plain" :label="item.no" v-for="(item, index) in bedList" :key="index">{{item.no}}</el-radio-button>
+             <el-radio-button type="plain" :label="item.bedId" :value="item.bedId" v-for="(item, index) in bedList" :key="index">{{item.no}}</el-radio-button>
           </el-radio-group>
         </el-form-item>
       </el-form>
@@ -117,6 +117,54 @@
         @on-page-size-change="onOrderSizeChange">
       </base-table>
     </el-dialog>
+    <el-dialog top="2%" width="1100px" title="家属管理" center :visible.sync="familyDialogVisible" :close-on-click-modal="false">
+      <el-form ref="familyForm" :inline="true" :model="familyFrom" :rules="familyRules" class="demo-form-inline" size="small" label-width="66px">
+        <el-form-item label="姓名" prop="name">
+          <el-input placeholder="家属名称"  v-model="familyFrom.name"></el-input>
+        </el-form-item>
+        <el-form-item label="性别" prop="gender">
+          <el-select clearable class="caption-item gutter" placeholder="性别" v-model="familyFrom.gender" style="width:184px">
+            <el-option label='男' :value='0'></el-option>
+            <el-option label='女' :value='1'></el-option>
+            <el-option label='其他' :value='2'></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="民族" prop="nation">
+          <el-select clearable class="caption-item gutter" placeholder="民族" v-model="familyFrom.nation" style="width:184px">
+            <el-option :label='item.name' :value='item.name' v-for="(item, index) in nationList" :key="index" :selected="familyFrom.nation === item.name"></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="号码" prop="phoneNumber">
+          <el-input placeholder="手机号码"  v-model="familyFrom.phoneNumber"></el-input>
+        </el-form-item>
+        <el-form-item label="身份证" prop="idcard">
+          <el-input placeholder="身份证号码"  v-model="familyFrom.idcard"></el-input>
+        </el-form-item>
+        <el-form-item label="关系" prop="relation">
+          <el-input placeholder="老人与家属关系(父子...)"  v-model="familyFrom.relation"></el-input>
+        </el-form-item>
+        <el-form-item label="地址" prop="address">
+          <el-input placeholder="家属地址" style="width:284px;" v-model="familyFrom.address"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" v-if="!famlilyTableFrom.edit"  @click="addFamily">新增</el-button>
+          <template v-else>
+            <el-button type="primary" plain @click="updateContact">更新</el-button>
+            <el-button plain @click="cancelfamilyEdit">取消更新</el-button>
+          </template>
+        </el-form-item>
+      </el-form>
+      <base-table
+        :tableData="familyList"
+        :columns="columns3"
+        border
+        v-loading="familyLoading"
+        :pageTotal="famlilyTableFrom.total"
+        :pageSize="famlilyTableFrom.pageSize"
+        @on-current-page-change="familyCurrentChange"
+        @on-page-size-change="familySizeChange">
+      </base-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -124,6 +172,7 @@
 import BaseTable from '@/assets/package/table-base'
 import ElderAPI from '@/api/elder'
 import RoomAPI from '@/api/room'
+import SystemAPI from '@/api/system'
 // import echarts from 'echarts'
 
 const echarts = require('echarts/lib/echarts')
@@ -207,12 +256,44 @@ export default {
         { 'lng': 113.835782, 'lat': 23.378651 }
       ],
       showPolygonPath: [],
+      // 家属管理
+      familyDialogVisible: false,
+      familyFrom: {
+        name: '',
+        phoneNumber: '',
+        idcard: '',
+        nation: '',
+        gender: '',
+        relation: '',
+        address: ''
+      },
+      familyRules: {
+        name: [{ required: true, trigger: 'blur', message: '姓名不能为空'}],
+        phoneNumber: [{ required: true, trigger: 'blur', message: '电话号码不能为空'}],
+        idcard: [{ required: true, trigger: 'blur', message: '身份证不能为空'}],
+        nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
+        gender: [{ required: true, trigger: 'blur', message: '性别不能为空'}],
+        relation: [{ required: true, trigger: 'blur', message: '地址不能为空'}],
+        address: [{ required: true, trigger: 'blur', message: '居住地址不能为空'}]
+      },
+      familyList: [],
+      famlilyTableFrom: {
+        pageNo: 1,
+        pageSize: 10,
+        total: 0,
+        edit: false // 编辑模式
+      },
+      familyLoading: false,
+      columns3: [],
+      nationList: []
     }
   },
   components: {BaseTable, elderCreate, BaiduMap, BmNavigation, BmMarker, BmPolygon, BmGeolocation},
   created () {
     this.columns = this.getColumns()
     this.columns2 = this.getColumns2()
+    this.columns3 = this.getColumns3()
+    this.getNationList()
     this.getElderList()
     this.tableDataEchart.push({
       'id': 1,
@@ -379,18 +460,18 @@ export default {
       }, {
         label: '老人姓名',
         prop: 'name',
-        // width: '90px',
+        width: '90px',
         align: 'center'
       }, {
         label: '手机号码',
         prop: 'phoneNumber',
-        // width: '120px',
+        width: '120px',
         align: 'center'
       }, {
         label: '机构类型',
         prop: 'type',
         align: 'center',
-        // width: '90px',
+        width: '90px',
         formatter (val) {
           return val === 1 ? '居家老人' : '机构老人'
         }
@@ -398,7 +479,7 @@ export default {
         label: '房床号',
         prop: 'bedNo',
         align: 'center',
-        // width: '120px',
+        width: '120px',
         formatter (val, row) {
           return `${row.roomNo || ''} - ${val || ''}`
         }
@@ -406,7 +487,7 @@ export default {
         label: '住院状态',
         prop: 'status',
         align: 'center',
-        // width: '90px',
+        width: '90px',
         formatter (val) {
           return val === 1 ? '在住' : '退院'
         }
@@ -414,7 +495,7 @@ export default {
         label: '费用状况',
         prop: 'feeStatus',
         align: 'center',
-        // width: '90px',
+        width: '90px',
         formatter (val) {
           return val === 1 ? '无欠费' : '欠费'
         }
@@ -432,23 +513,40 @@ export default {
       }]
     },
     getToolboxRender (h, row) {
+      if (row.status === 1) {
+        return [
+          <el-button size="tiny" title="编辑老人" icon="el-icon-user" onClick={() => this.handleEdit(row)}></el-button>,
+          <el-button size="tiny" title="安排床位" disabled icon="el-icon-s-help" onClick={() => this.handleCheckIn(row)}></el-button>,
+          <el-button size="tiny" title="日程安排" icon="el-icon-date" onClick={() => this.getTaskList(row)}></el-button>,
+          <el-button size="tiny" title="家属管理" icon="el-icon-s-comment" onClick={() => this.familyEdit(row)}></el-button>,
+          <el-button size="tiny" title="老人离院" icon="el-icon-circle-close" onClick={() => this.leaveEdit(row)}></el-button>,
+          <el-button size="tiny" title="历史数据" icon="el-icon-tickets" onClick={() => this.tohistory(row)}></el-button>
+          // <el-button size="tiny" title="删除" disabled icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
+        ]
+      }
       return [
-        <el-button size="tiny" title="日程安排" icon="el-icon-tickets" onClick={() => this.getTaskList(row)}></el-button>,
-        <el-button size="tiny" title="安排入住" icon="el-icon-s-help" onClick={() => this.handleCheckIn(row)}></el-button>,
-        <el-button size="tiny" title="编辑老人" icon="el-icon-edit" onClick={() => this.handleEdit(row)}></el-button>,
-        <el-button size="tiny" title="删除" icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
+        <el-button size="tiny" title="编辑老人" icon="el-icon-user" onClick={() => this.handleEdit(row)}></el-button>,
+        <el-button size="tiny" title="安排床位" icon="el-icon-s-help" onClick={() => this.handleCheckIn(row)}></el-button>,
+        <el-button size="tiny" title="日程安排" icon="el-icon-date" onClick={() => this.getTaskList(row)}></el-button>,
+        <el-button size="tiny" title="家属管理" icon="el-icon-s-comment" onClick={() => this.familyEdit(row)}></el-button>,
+        <el-button size="tiny" title="老人离院" disabled icon="el-icon-circle-close" onClick={() => this.leaveEdit(row)}></el-button>,
+        <el-button size="tiny" title="历史数据" icon="el-icon-tickets" onClick={() => this.tohistory(row)}></el-button>
+        // <el-button size="tiny" title="删除" disabled icon="el-icon-delete" onClick={() => this.handleDelete(row)}></el-button>
       ]
     },
     getElderList () {
       this.tableLoading = true
-      ElderAPI.getElderList(this.search).then(resp => {
-        if (resp.code === 0) {
+      const sendDate = {...this.search}
+      sendDate.name === '' && delete sendDate.name
+      sendDate.type === '' && delete sendDate.type
+      sendDate.status === '' && delete sendDate.status
+      ElderAPI.getElderList(sendDate).then(resp => {
+        if (resp.code === 0 && resp.data && resp.data.records) {
           this.tableData = resp.data.records
           this.total = resp.data.total
         } else {
-          this.$message({
-            message: resp.message || '列表获取失败'
-          })
+          this.tableData = []
+          this.total = 0
         }
         this.tableLoading = false
       }).catch(err => {
@@ -462,8 +560,18 @@ export default {
     },
     getRoomList () {
       RoomAPI.getRoomList().then(resp => {
-        if (resp.code === 0) {
-          this.roomList = resp.data.records
+        if (resp.code === 0 && resp.data && resp.data.records.length) {
+          const tarObj = []
+          resp.data.records.forEach((ele, index) => {
+            const list = ele.bed.filter(ele2 => !ele2.status)
+            if (list.length) {
+              tarObj.push(Object.assign(ele, {
+                bed: list
+              }))
+            }
+          })
+          console.log('tarObj', tarObj)
+          this.roomList = tarObj
         }
       })
     },
@@ -480,6 +588,7 @@ export default {
       this.getElderList()
     },
     handleSearch () {
+      this.search.pageNo = 1
       this.getElderList()
     },
     handleCreate () {
@@ -488,49 +597,77 @@ export default {
       this.elderModel = {}
     },
     createElder (model, dialogVisible) {
+      console.log('model', model)
+      if (!model.telephone) (delete model.telephone)
       this.elderModel = model
-      ElderAPI.createElder(this.elderModel).then(res => {
-        if (res.code === 0) {
-          this.$message({
-            type: 'success',
-            message: res.msg || '老人创建成功'
-          })
-          this.createDialogVisible = dialogVisible
-          this.getElderList()
-        } else {
+      if (this.dialogAction === '添加老人') {
+        ElderAPI.createElder(this.elderModel).then(res => {
+          if (res.code === 201) {
+            this.$message({
+              type: 'success',
+              message: res.msg || '老人创建成功'
+            })
+            this.createDialogVisible = dialogVisible
+            this.getElderList()
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.msg || '老人创建失败'
+            })
+          }
+        }).catch(err => {
           this.$message({
             type: 'error',
-            message: res.msg || '老人创建失败'
+            message: '服务异常' + err
           })
-        }
-      }).catch(err => {
-        this.$message({
-          type: 'error',
-          message: '服务异常' + err
         })
-      })
+      } else if (this.dialogAction === '编辑老人') {
+        ElderAPI.updateElder({elderId: this.elderModel.id, ...this.elderModel}).then(res => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: res.msg || '老人更新成功'
+            })
+            this.createDialogVisible = dialogVisible
+            this.getElderList()
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.msg || '老人更新失败'
+            })
+          }
+        }).catch(err => {
+          this.$message({
+            type: 'error',
+            message: '服务异常' + err
+          })
+        })
+      }
     },
     handleCheckIn (row) {
       this.checkinDialogVisible = true
-      !this.roomList.length && this.getRoomList()
+      this.getRoomList()
       this.checkInModel.elder = row.name
       this.checkInModel.elderId = row.id
+      this.bedList = []
+      this.checkInModel.roomId = ''
     },
     doCheckIn () {
       this.$refs.checkInForm.validate(valid => {
         if (valid) {
-          ElderAPI.checkIn(this.checkInModel).then(res => {
+          ElderAPI.bindBed({elderId: this.checkInModel.elderId, bedId: this.checkInModel.bedNo}).then(res => {
             if (res.code === 0) {
               this.$message({
                 type: 'success',
-                message: res.msg || '安排入住成功'
+                message: res.msg || '安排床位成功'
               })
-              this.createDialogVisible = false
+              this.checkinDialogVisible = false
+              this.$store.dispatch('setelderList').catch(err => {})
               this.getElderList()
             } else {
               this.$message({
                 type: 'error',
-                message: res.msg || '入住失败'
+                message: res.msg || '安排床位失败'
               })
             }
           }).catch(err => {
@@ -555,18 +692,50 @@ export default {
         closeOnClickModal: false
       }).then(() => {
         this.doDelete(row.id)
+      }).catch(err => {
+        console.log('err', err)
+        console.log('取消删除')
+      })
+    },
+    leaveEdit (row) {
+      this.$confirm('确认出院？', '确认提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        ElderAPI.leaveElder({elderId: row.id}).then(res => {
+          if (res.code === 0) {
+            this.$message({
+              type: 'success',
+              message: res.msg || '出院操作成功'
+            })
+            this.$store.dispatch('setelderList').catch(err => {})
+            this.getElderList()
+          } else {
+            this.$message({
+              type: 'error',
+              message: res.msg || '出院操作失败'
+            })
+          }
+        }).catch(err => {
+          this.$message({
+            type: 'error',
+            message: '服务异常' + err
+          })
+        })
       }).catch(() => {
         console.log('取消删除')
       })
     },
     doDelete (id) {
       ElderAPI.deleteElder(id).then(res => {
-        if (res.code === 0) {
+        if (res.code === 516) {
           this.$message({
             type: 'success',
             message: res.msg || '老人删除成功'
           })
-          this.getHouseList()
+          this.getElderList()
         } else {
           this.$message({
             type: 'error',
@@ -709,7 +878,7 @@ export default {
     getOrderList () {
       this.tableLoading2 = true
       ElderAPI.getTaskList({elderId: this.orderForm.elderId, ...this.search2}).then(res => {
-        if (res.code === 0) {
+        if (res.code === 0 && res.data) {
           this.total2 = res.data.total
           this.tableData2 = res.data.records
         }
@@ -775,6 +944,190 @@ export default {
       }).catch(err => {
         this.$message.error(err.msg || '删除失败')
       })
+    },
+    familyEdit (row) {
+      this.elderModel = {...row}
+      this.familyDialogVisible = true
+      this.famlilyTableFrom.edit = false
+      this.famlilyTableFrom.pageNo = 1
+      this.famlilyTableFrom.pageSize = 10
+      this.famlilyTableFrom.total = 0
+      this.familyList = []
+      Object.keys(this.familyFrom).forEach(ele => (this.familyFrom[ele] = ''))
+      this.getContactList()
+    },
+    getContactList () {
+      this.familyLoading = true
+      ElderAPI.getContactList({
+        elderId: this.elderModel.id,
+        pageNo: this.famlilyTableFrom.pageNo,
+        pageSize: this.famlilyTableFrom.pageSize
+      }).then(res => {
+        this.familyLoading = false
+        if (res.code === 0) {
+          if (res.data) {
+            this.familyList = res.data.records
+            this.famlilyTableFrom.total = res.data.total
+          } else {
+            this.familyList = []
+            this.famlilyTableFrom.total = 0
+          }
+        } else {
+          this.$message.error(res.msg)
+        }
+      }).catch(err => {
+        this.familyLoading = false
+        this.$message.error(err.msg || '获取失败')
+      })
+    },
+    addFamily () {
+      this.$refs.familyForm.validate(valid => {
+        if (valid) {
+          ElderAPI.bindContactCreat({
+            elderId: this.elderModel.id,
+            list: [this.familyFrom]
+          }).then(res => {
+            if (res.code === 0) {
+              this.$message.success('添加成功')
+              this.getContactList()
+            } else {
+              this.$message.error(res.msg)
+            }
+          }).catch(err => {
+            this.$message.error(err.msg || '添加失败')
+          })
+        }
+      })
+    },
+    familyCurrentChange (pageNo) {
+      this.famlilyTableFrom.pageNo = pageNo
+      this.getContactList()
+    },
+    familySizeChange (pageSize) {
+      this.famlilyTableFrom.pageSize = pageSize
+      this.getContactList()
+    },
+    delectFamily (row) {
+      this.$confirm('确认删除家属？', '确认提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+        closeOnClickModal: false
+      }).then(() => {
+        ElderAPI.delectContact({
+          elderId: this.elderModel.id,
+          relationId: row.relationId
+        }).then(res => {
+          if (res.code === 0) {
+            if (this.familyList.length === 1 && this.famlilyTableFrom.pageNo > 1) {
+              this.famlilyTableFrom.pageNo -= 1
+            }
+            this.$message.success('删除成功')
+            this.famlilyTableFrom.edit = false
+            this.getContactList()
+          } else {
+            this.$message.error(res.msg)
+          }
+        }).catch(err => {
+          this.$message.error(err.msg || '删除失败')
+        })
+      }).catch(err => {
+        console.log('err', err)
+        console.log('取消删除')
+      })
+    },
+    editFamily (row) {
+      this.familyFrom = {...row, phoneNumber: row.phone}
+      this.famlilyTableFrom.edit = true
+    },
+    cancelfamilyEdit () {
+      this.famlilyTableFrom.edit = false
+      Object.keys(this.familyFrom).forEach(ele => (this.familyFrom[ele] = ''))
+    },
+    updateContact () {
+      this.$refs.familyForm.validate(valid => {
+        if (valid) {
+          ElderAPI.updateContact({
+            elderId: this.elderModel.id,
+            ...this.familyFrom
+          }).then(res => {
+            if (res.code === 0) {
+              this.$message.success('更新成功')
+              this.cancelfamilyEdit()
+              this.getContactList()
+            } else {
+              this.$message.error(res.msg)
+            }
+          }).catch(err => {
+            this.$message.error(err.msg || '更新失败')
+          })
+        }
+      })
+    },
+    getColumns3 () {
+      return [{
+        label: '姓名',
+        prop: 'name',
+        align: 'center'
+      }, {
+        label: '性别',
+        prop: 'gender',
+        align: 'center',
+        formatter (val) {
+          return val === 1 ? '女' : val === 0 ? '男' : '其它'
+        }
+      }, {
+        label: '民族',
+        prop: 'nation',
+        align: 'center',
+      }, {
+        label: '号码',
+        prop: 'phone',
+        minWidth: '160px',
+        align: 'center'
+      }, {
+        label: '身份证',
+        prop: 'idcard',
+        minWidth: '160px',
+        align: 'center'
+      }, {
+        label: '关系',
+        prop: 'relation',
+        minWidth: '80px',
+        align: 'center'
+      }, {
+        label: '地址',
+        prop: 'address',
+        minWidth: '160px',
+        align: 'center'
+      },
+      {
+        label: '操作',
+        align: 'center',
+        minWidth: '100px',
+        renderBody: (h, row) => {
+          return [
+            <el-button size="tiny" title="编辑家属" icon="el-icon-edit" onClick={() => this.editFamily(row)}></el-button>,
+            <el-button size="tiny" title="删除" icon="el-icon-delete" onClick={() => this.delectFamily(row)}></el-button>
+          ]
+        }
+      }]
+    },
+    getNationList () {
+      SystemAPI.getdictList({type: 3}).then(res => {
+        if (res && res.code === 0 && res.data) {
+          this.nationList = res.data.records
+        }
+      })
+    },
+    tohistory (row) {
+      this.$router.push({
+        path: '/elder/history.html',
+        query: {
+          elderId: row.id,
+          name: row.name
+        }
+      })
     }
   }
 }
@@ -818,17 +1171,30 @@ export default {
   }
 }
 </style>
-<style>
-.elder-table__detail .el-form-item{
-  margin-bottom: 0;
-}
-.elder-table__detail .el-form-item span{
-  color: #999;
-}
-.el-table .color-green {
-  background: rgba(0, 128, 0, 0.3);
-}
-.el-table .color-red {
-  background: rgba(255, 5, 5, 0.432);
+<style lang="scss">
+.elder-index {
+  .el-table__header {
+      tr {
+        th {
+          background-color: #1C3386;
+          color:#FFFFFF;
+        }
+      }
+    }
+  .el-pagination__total, .el-pagination__jump {
+    color: #fff;
+  }
+  .elder-table__detail .el-form-item{
+    margin-bottom: 0;
+  }
+  .elder-table__detail .el-form-item span{
+    color: #999;
+  }
+  .el-table .color-green {
+    background: rgba(0, 128, 0, 0.3);
+  }
+  .el-table .color-red {
+    background: rgba(255, 5, 5, 0.432);
+  }
 }
 </style>

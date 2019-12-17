@@ -4,7 +4,7 @@
       :height="tableHeight"
       :tableData="tableData"
       :columns="columns"
-      stripe border
+      stripe
       v-loading="tableLoading"
       :pageTotal="total"
       :pageSize="search.pageSize"
@@ -12,11 +12,11 @@
       @on-page-size-change="onSizeChange">
       <slot>
         <template slot="caption">
-          <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="设备名" v-model="search.name"></el-input>
-          <el-button type="primary" icon="el-icon-search" @click="handleSearch">查询</el-button>
+          <el-input @keyup.enter.native="handleSearch" class="caption-item" placeholder="设备名" v-model="search.name" size="small"></el-input>
+          <el-button type="primary" icon="el-icon-search" @click="handleSearch" size="small">查询</el-button>
         </template>
         <template slot="actionBar">
-          <el-button type="primary" icon="el-icon-plus" @click="handleCreate">添加设备</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleCreate" size="small">添加设备</el-button>
         </template>
       </slot>
     </base-table>
@@ -209,5 +209,20 @@ export default {
 <style scoped>
 .device{
   padding: 20px;
+}
+</style>
+<style lang="scss">
+.device {
+  .el-table__header {
+    tr {
+      th {
+        background-color: #1C3386;
+        color:#FFFFFF;
+      }
+    }
+  }
+   .el-pagination__total, .el-pagination__jump {
+    color: #fff;
+  }
 }
 </style>

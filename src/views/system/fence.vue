@@ -366,7 +366,7 @@ export default {
   }
 }
 .aside {
-  background: #fff;
+  background: #1A2C6B;
   position: fixed;
   top: 51px;
   left: 0;
@@ -374,6 +374,9 @@ export default {
   height: 100%;
   overflow: hidden;
   padding: 5px;
+  .el-table {
+    background-color: #1A2C6B;
+  }
 }
 .slider-container{
   padding: 10px;
@@ -408,8 +411,28 @@ export default {
   text-align: center;
 }
 </style>
-<style lang="css">
-.el-button--tiny{
-  padding: 5px;
+<style lang="scss">
+.fence {
+  .el-button--tiny{
+    padding: 5px;
+  }
+  .aside {
+    .el-table {
+      background-color: #1A2C6B;
+      .el-table__header tr,.el-table__body tr{
+        background-color: #1A2C6B;
+        th {
+          color: #fff;
+          background-color: #1A2C6B;
+        }
+        .cell {
+          color: #fff;
+        }
+      }
+      .el-table__body tr:hover > td .cell{
+        color: #1A2C6B
+      }
+    }
+  }
 }
 </style>

@@ -18,9 +18,9 @@
             <div class="person-real-info">
               <p class="person-info-title">状态<br><strong>{{perSonInfo.deviceStatus}}</strong></p>
               <p class="person-info-details">
-                <span class="pdr10">床心率<br><strong>{{perSonInfo.heartRate}}</strong></span>
-                <span class="pdr10">手环心率<br><strong>{{serialInfo[serialId] && serialInfo[serialId].heartRate}}</strong></span>
-                <span class="pdr10">手环血压<br><strong>{{serialInfo[serialId] && serialInfo[serialId].dbp}}~{{serialInfo[serialId] && serialInfo[serialId].sdp}}</strong></span>
+                <span class="pdr10">床心率<br><strong>{{(perSonInfo.heartRate || 0).toFixed(2)}}</strong></span>
+                <span class="pdr10">手环心率<br><strong>{{((serialInfo[serialId] && serialInfo[serialId].heartRate) || 0).toFixed(2)}}</strong></span>
+                <span class="pdr10">手环血压<br><strong>{{((serialInfo[serialId] && serialInfo[serialId].dbp) || 0).toFixed(2)}}~{{((serialInfo[serialId] && serialInfo[serialId].sdp) || 0).toFixed(2)}}</strong></span>
               </p>
               <div>
                 <video id="example_video_1" class="video-js vjs-default-skin" controls preload="none" v-show="vidioUrl">
@@ -135,6 +135,9 @@ export default {
     return {
       activeName: '0',
       serialId: '',
+      watchId: '',
+      beadId: '',
+      tvId: '',
       elderName: '',
       type: 0,
       defaultOption,
@@ -174,7 +177,10 @@ export default {
       bedmonthDayList: [],
       bedMonthHeartRate: []
     }
-    this.serialId = this.$route.query.serialId || ''
+    this.serialId = this.$route.query.watchId || ''
+    this.watchId = this.$route.query.watchId || ''
+    this.beadId = this.$route.query.beadId || ''
+    this.tvId = this.$route.query.tvId || ''
     this.elderName = this.$route.query.elderName || ''
     this.type = this.$route.query.type + '' || '0'
     window.onblur = function () {
@@ -184,9 +190,11 @@ export default {
     this.perSonInfo = this.elderList.find(ele => {
       return ele.elderName === this.$route.query.elderName
     })
-    if (this.serialId) {
-      this.getSerialInfo(this.serialId)
-      DeviceApi.bloodPressureHistory({serialId: this.serialId}).then(res => {
+    if (this.watchId) {
+      this.$store.dispatch('getWatchHeartRates', this.watchId).then(res => {}).catch(err => {})
+      this.$store.dispatch('getWatchBloodPressure', this.watchId).then(res => {}).catch(err => {})
+      this.$store.dispatch('getWatchLocation', this.watchId).then(res => {}).catch(err => {})
+      DeviceApi.bloodPressureHistory({serialId: this.watchId}).then(res => {
         if (res.code === 0) {
           res.data.week.forEach(element => {
             tarList.weekDayList.unshift(element.time)
@@ -361,12 +369,20 @@ export default {
               }
             ]
           })
-          this.option5 && this.changeTab(this.$route.query.tab + '' || '1')
+          // this.option5 && this.changeTab(this.$route.query.tab + '' || '1')
+          this.$nextTick(() => {
+            this.drawEchart(document.getElementById('watchPressureWeek'), this.option1)
+            this.drawEchart(document.getElementById('watchPressureMonth'), this.option2)
+            this.drawEchart(document.getElementById('watchHeartRateWeek'), this.option3)
+            this.drawEchart(document.getElementById('watchHeartRateMonth'), this.option4)
+          })
         }
       }).catch(err => {
         console.log('err', err)
       })
-      DeviceApi.mattresHeartRateHistory({serialId: this.serialId}).then(res => {
+    }
+    if (this.beadId) {
+      DeviceApi.mattresHeartRateHistory({serialId: this.beadId}).then(res => {
         if (res.code === 0) {
           res.data.week.forEach(element => {
             tarList.bedWeekDayList.unshift(element.time)
@@ -451,15 +467,19 @@ export default {
               }
             ]
           })
-          this.option1 && this.changeTab(this.$route.query.tab + '' || '1')
+          // this.option1 && this.changeTab(this.$route.query.tab + '' || '1')
+          this.$nextTick(() => {
+            this.drawEchart(document.getElementById('bedHeartRateWeek'), this.option5)
+            this.drawEchart(document.getElementById('bedHeartRateMonth'), this.option6)
+          })
         }
       }).catch(err => {
         console.log('err', err)
       })
     }
-    if(this.perSonInfo.list && this.perSonInfo.list.length) {
-      let videoObj = this.perSonInfo.list.find(ele => ele.deviceType ===3)
-      if(videoObj) {
+    if (this.tvId) {
+      const videoObj = this.perSonInfo.list.find(ele => ele.deviceType === 3)
+      if (videoObj) {
         this.vidioUrl = videoObj.serialId
         this.$nextTick(() => {
           this.openTV()
@@ -468,23 +488,6 @@ export default {
     }
   },
   methods: {
-    handleClick (tab, event) {
-      this.changeTab((tab.index * 1) + 1)
-    },
-    changeTab (tab = '1') {
-      tab += ''
-      if (this.activeName === tab) return
-      this.playVideo && this.playVideo.pause()
-      this.$nextTick(() => {
-        this.drawEchart(document.getElementById('watchPressureWeek'), this.option1)
-        this.drawEchart(document.getElementById('watchPressureMonth'), this.option2)
-        this.drawEchart(document.getElementById('watchHeartRateWeek'), this.option3)
-        this.drawEchart(document.getElementById('watchHeartRateMonth'), this.option4)
-        this.drawEchart(document.getElementById('bedHeartRateWeek'), this.option5)
-        this.drawEchart(document.getElementById('bedHeartRateMonth'), this.option6)
-        this.openTV()
-      })
-    },
     openTV () {
       const options = {}
       this.playVideo = videojs('example_video_1', options, function onPlayerReady () {

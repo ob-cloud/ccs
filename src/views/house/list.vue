@@ -1,10 +1,10 @@
 <template>
-  <div class="content">
+  <div class="content house-index">
     <base-table
       :height="tableHeight"
       :tableData="tableData"
       :columns="columns"
-      stripe border
+      stripe
       v-loading="tableLoading"
       :pageTotal="total"
       :pageSize="search.pageSize"
@@ -359,5 +359,21 @@ export default {
 }
 .coors .caption-item:last-of-type{
   margin-left: 12px;
+}
+
+</style>
+<style  lang="scss">
+.house-index {
+  .el-table__header {
+      tr {
+        th {
+          background-color: #1C3386;
+          color:#FFFFFF;
+        }
+      }
+    }
+  .el-pagination__total, .el-pagination__jump {
+    color: #fff;
+  }
 }
 </style>

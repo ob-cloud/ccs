@@ -48,7 +48,7 @@
               </div>
               <div @click="showChart(item, '1', item.elderName)" class="handle-point">
                 <div class="text item" :title="item.roomNo+'-'+item.bedNo+'-'+item.elderName">
-                  <el-button icon="el-icon-video-camera-solid" size="mini" circle title="实时监控" @click.stop="showVedio(item)"></el-button> {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
+                  <el-button icon="el-icon-video-camera-solid" size="mini" circle title="实时监控" @click="showVedio(item)"></el-button> {{item.roomNo}}-{{item.bedNo}} {{item.elderName}}
                 </div>
                 <div class="bottom clearfix">
                   <el-button type="text" icon="obicon obicon-cexinshuai" style="float:left;" title="床心率"><i class="obicon obicon-chuang"></i> {{item.heartRate | deviceDataFilter}}</el-button>
@@ -421,12 +421,29 @@ export default {
       return '-'
     },
     showChart (row, tab, elderName) {
-      const tarDevice = row.list.find(ele => ele.deviceType === 2) || {}
+      let watchId, beadId, tvId
+      if (row.list) {
+        row.list.forEach(ele => {
+          switch (ele.deviceType) {
+            case 1:
+              beadId = ele.serialId
+              break
+            case 2:
+              watchId = ele.serialId
+              break
+            case 3:
+              tvId = ele.serialId
+              break
+          }
+        })
+      }
       if (row) {
         this.$router.push({
           path: '/dashboard/chart.html',
           query: {
-            serialId: tarDevice.serialId,
+            watchId,
+            beadId,
+            tvId,
             tab,
             elderName,
             type: row.type
@@ -437,7 +454,7 @@ export default {
       }
     },
     showVedio (item) {
-      this.$message.info('功能开发中')
+      // this.$message.info('功能开发中')
     },
     getDailyTask () {
       ElderAPI.getDailyTask({
@@ -504,9 +521,6 @@ $ob-blue: rgb(0, 91, 172);
   width: 200px;
   height: 100%;
   overflow: hidden;
-}
-.app-body{
-  /* margin-left: 200px; */
 }
 .reload-news {
   text-align: center;

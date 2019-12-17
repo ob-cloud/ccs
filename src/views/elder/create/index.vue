@@ -29,7 +29,7 @@
               <el-col :span="8">
                 <el-form-item label="民族" prop="nation">
                   <el-select clearable class="caption-item gutter" placeholder="民族" v-model="elderModel.nation">
-                    <el-option :label='item.name' :value='item.code' v-for="(item, index) in nationList" :key="index"></el-option>
+                    <el-option :label='item.name' :value='item.name' v-for="(item, index) in nationList" :key="index" :selected="elderModel.nation === item.name"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -73,7 +73,7 @@
               <el-col :span="8">
                 <el-form-item label="血型" prop="bloodType">
                   <el-select clearable class="caption-item gutter" placeholder="血型" v-model="elderModel.bloodType">
-                    <el-option :label='item.name' :value='item.code' v-for="(item, index) in bloodTypeList" :key="index"></el-option>
+                    <el-option :label='item.name' :value='item.name' v-for="(item, index) in bloodTypeList" :key="index"></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -93,7 +93,6 @@
                     <el-option label='本科' value='本科'></el-option>
                     <el-option label='大专' value='大专'></el-option>
                     <el-option label='中学' value='中学'></el-option>
-                    <el-option label='-' value='-'></el-option>
                   </el-select>
                 </el-form-item>
               </el-col>
@@ -132,7 +131,8 @@
                     class="caption-item gutter"
                     v-model="elderModel.checkInTime"
                     type="date"
-                    value-format="yyyy-MM-dd"
+                    format="yyyy-MM-dd"
+                    value-format="timestamp"
                     placeholder="选择入院时间">
                   </el-date-picker>
                 </el-form-item>
@@ -143,7 +143,7 @@
               <el-col>
                 <el-form-item label="病史介绍">
                   <el-checkbox-group v-model="medicalHistory" size="small">
-                    <el-checkbox class="checkbox" border v-for="item in medicalList" :label="item.code" :key="item.id">{{item.name}}</el-checkbox>
+                    <el-checkbox class="checkbox" border v-for="item in medicalList" :label="item.name" :key="item.id">{{item.name}}</el-checkbox>
                   </el-checkbox-group>
                 </el-form-item>
               </el-col>
@@ -184,28 +184,28 @@
               v-model="elderModel.nursingRecord">
             </el-input>
           </el-tab-pane>
-          <el-tab-pane label="就医记录" name="medialRecord">
+          <el-tab-pane label="就医记录" name="medicalRecord">
             <el-input
               type="textarea"
               :rows="20"
               placeholder="请输入就医记录"
-              v-model="elderModel.medialRecord">
+              v-model="elderModel.medicalRecord">
             </el-input>
           </el-tab-pane>
-          <el-tab-pane label="老人日程" name="agenda">
+          <!-- <el-tab-pane label="老人日程" name="agenda">
             <el-input
               type="textarea"
               :rows="20"
               placeholder="请输入老人日程"
               v-model="elderModel.agenda">
             </el-input>
-          </el-tab-pane>
-          <el-tab-pane label="零用金清单" name="pocketmoney">
+          </el-tab-pane> -->
+          <el-tab-pane label="零用金清单" name="pocketMoney">
             <el-input
               type="textarea"
               :rows="20"
               placeholder="请输入零用金清单"
-              v-model="elderModel.pocketmoney">
+              v-model="elderModel.pocketMoney">
             </el-input>
           </el-tab-pane>
         </el-tabs>
@@ -257,23 +257,25 @@ export default {
         nursingRecord: '',
         medicalRecord: '',
         agenda: '',
-        pocketmoney: ''
+        pocketMoney: ''
       },
       medicalHistory: [],
       elderModelRules: {
         name: [{ required: true, trigger: 'blur', message: '姓名不能为空'}],
         gender: [{ required: true, trigger: 'blur', message: '性别不能为空'}],
-        // nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
+        nation: [{ required: true, trigger: 'blur', message: '民族不能为空'}],
         idcard: [{ required: true, trigger: 'blur', message: '身份证不能为空'}],
         birthday: [{ required: true, trigger: 'blur', message: '生日不能为空'}],
         age: [{ required: true, trigger: 'blur', message: '年龄不能为空'}],
-        address: [{ required: true, trigger: 'blur', message: '居住地址不能为空'}]
+        address: [{ required: true, trigger: 'blur', message: '居住地址不能为空'}],
+        phoneNumber: [{ required: true, trigger: 'blur', message: '电话号码不能为空'}]
       }
     }
   },
   mounted () {
-    if (this.model) {
+    if (this.model && Object.keys(this.model).length) {
       this.elderModel = {...this.model}
+      this.elderModel.medicalHistory && (this.medicalHistory = this.elderModel.medicalHistory.split(','))
     }
     this.getNationList()
     this.getBloodTypeList()
@@ -281,22 +283,22 @@ export default {
   },
   methods: {
     getNationList () {
-      SystemAPI.getNactionList().then(res => {
-        if (res && res.code === 0) {
+      SystemAPI.getdictList({type: 3}).then(res => {
+        if (res && res.code === 0 && res.data) {
           this.nationList = res.data.records
         }
       })
     },
     getBloodTypeList () {
-      SystemAPI.getBloodTypeList().then(res => {
-        if (res && res.code === 0) {
+      SystemAPI.getdictList({type: 4}).then(res => {
+        if (res && res.code === 0 && res.data) {
           this.bloodTypeList = res.data.records
         }
       })
     },
     getMedicalList () {
-      SystemAPI.getMedicalList().then(res => {
-        if (res && res.code === 0) {
+      SystemAPI.getdictList({type: 2}).then(res => {
+        if (res && res.code === 0 && res.data) {
           this.medicalList = res.data.records
         }
       })
@@ -304,7 +306,7 @@ export default {
     createElder () {
       this.$refs.elderForm.validate(valid => {
         if (valid) {
-          this.$emit('data-ready', this.elderModel, false)
+          this.$emit('data-ready', {...this.elderModel, medicalHistory: this.medicalHistory.join(',')}, false)
         }
       })
     },
