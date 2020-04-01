@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-19 11:33:40
  * @Last Modified by: eamiear
- * @Last Modified time: 2019-09-25 11:39:14
+ * @Last Modified time: 2020-04-01 23:00:03
  */
 
 import SockJS from 'sockjs-client'
@@ -129,6 +129,53 @@ const user = {
                         break
                       default:
                         break
+                    }
+
+                    // TODO 床垫测试代码
+                    if (record.callTaskName === '床垫' && record.serialId) {
+                      const status = record.deviceStatus
+                      const heartRateStatus = status.slice(0, 2)
+                      let healthStatus = status.slice(2, 4)
+                      // const breathStatus = status.slice(4, 6)
+                      const bedStatus = parseInt(status.slice(6, 8))
+
+                      const heartRateValue = heartRateStatus === '0xFF' ? '-' : parseInt(heartRateStatus, 16).toString(10)
+
+                      // 健康状态
+                      healthStatus = parseInt(healthStatus, 16).toString(2)
+                      const healthHeartRateValue = healthStatus.slice(0, 2) % 2 === 1 ? healthStatus.slice(0, 2) + '0' : healthStatus.slice(0, 2) || '00'
+                      const healthBreathValue = healthStatus.slice(2, 4) % 2 === 1 ? healthStatus.slice(2, 4) + '0' : healthStatus.slice(2, 4) || '00'
+                      const healthHeartRateMap = {
+                        '00': '心率正常',
+                        '01': '心率过慢',
+                        '10': '心率过快'
+                      }
+                      const healthBreathMap = {
+                        '00': '呼吸正常',
+                        '01': '呼吸过慢',
+                        '10': '呼吸过快'
+                      }
+
+                      // hex
+                      const bedStatusMap = {
+                        '0': '离床',
+                        '1': '体动'
+                      }
+
+                      const healthHeartRateTextValue = healthHeartRateMap[healthHeartRateValue]
+                      const healthBreathTextValue = healthBreathMap[healthBreathValue]
+                      const beStatusTextValue = bedStatusMap[bedStatus]
+
+                      // 获取老人记录，解析状态
+                      const bedElderItem = state.elderList.find(ele => {
+                        return ele.list && ele.list.find(element => element.serialId === record.serialId)
+                      })
+
+                      bedElderItem.deviceStatus = `${beStatusTextValue || ''} - ${healthHeartRateTextValue || ''} - ${healthBreathTextValue || ''}`
+                      bedElderItem.heartRate = +heartRateValue
+
+                      // 解析心率信息
+                      commit('SET_SERIAL_INFO', Object.assign({}, bedElderItem, state.serialInfo[record.serialId] || {}, record))
                     }
                   } catch (error) {
                     console.log('推送解析失败', error)
