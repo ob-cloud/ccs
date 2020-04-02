@@ -39,6 +39,10 @@
                 <div class="bottom clearfix">
                   <el-button type="text" icon="obicon obicon-xieya" style="float:left;" title="手表血压"><i class="obicon obicon-huaban"></i> {{getbedInfo(item.list, 'dbp')}}-{{getbedInfo(item.list, 'sdp')}}</el-button>
                 </div>
+                <div class="bottom clearfix" style="font-size: 12px; margin-top: -12px;" v-if="item.healthStatus" :title="item.healthStatus">
+                  <span style="font-weight: bold;">健康状态:  </span>
+                  <span>{{item.healthStatus}}</span>
+                </div>
               </div>
             </el-card>
             <p class="type-title">居家老人</p>
@@ -589,7 +593,7 @@ $ob-blue: rgb(0, 91, 172);
   /* width: 140px;
   height: 132px; */
   width: 160px;
-  height: 160px;
+  height: 170px;
   display: inline-block;
   margin-left: 10px;
   margin-bottom: 10px;

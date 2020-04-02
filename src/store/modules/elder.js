@@ -2,7 +2,7 @@
  * @Author: eamiear
  * @Date: 2019-09-19 11:33:40
  * @Last Modified by: eamiear
- * @Last Modified time: 2020-04-01 23:00:03
+ * @Last Modified time: 2020-04-02 10:02:23
  */
 
 import SockJS from 'sockjs-client'
@@ -143,8 +143,9 @@ const user = {
 
                       // 健康状态
                       healthStatus = parseInt(healthStatus, 16).toString(2)
-                      const healthHeartRateValue = healthStatus.slice(0, 2) % 2 === 1 ? healthStatus.slice(0, 2) + '0' : healthStatus.slice(0, 2) || '00'
-                      const healthBreathValue = healthStatus.slice(2, 4) % 2 === 1 ? healthStatus.slice(2, 4) + '0' : healthStatus.slice(2, 4) || '00'
+                      healthStatus = healthStatus % 2 === 1 ? '0' + healthStatus : healthStatus
+                      const healthHeartRateValue = healthStatus.slice(0, 2).length % 2 === 1 ? '0' + healthStatus.slice(0, 2) : healthStatus.slice(0, 2) || '00'
+                      const healthBreathValue = healthStatus.slice(2, 4).length % 2 === 1 ? '0' + healthStatus.slice(2, 4) : healthStatus.slice(2, 4) || '00'
                       const healthHeartRateMap = {
                         '00': '心率正常',
                         '01': '心率过慢',
@@ -171,8 +172,9 @@ const user = {
                         return ele.list && ele.list.find(element => element.serialId === record.serialId)
                       })
 
-                      bedElderItem.deviceStatus = `${beStatusTextValue || ''} - ${healthHeartRateTextValue || ''} - ${healthBreathTextValue || ''}`
+                      bedElderItem.deviceStatus = `${beStatusTextValue || ''}`
                       bedElderItem.heartRate = +heartRateValue
+                      bedElderItem.healthStatus = `${healthHeartRateTextValue || ''} - ${healthBreathTextValue || ''}`
 
                       // 解析心率信息
                       commit('SET_SERIAL_INFO', Object.assign({}, bedElderItem, state.serialInfo[record.serialId] || {}, record))
