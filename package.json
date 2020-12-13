@@ -2,7 +2,7 @@
   "name": "ccs",
   "version": "0.1.0",
   "description": "A Vue Admin Template",
-  "author": "eamiear <justcall_me_k@163.com>",
+  "author": "",
   "scripts": {
     "serve": "vue-cli-service serve --fix",
     "build": "vue-cli-service build",
